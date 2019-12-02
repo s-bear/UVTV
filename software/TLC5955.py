@@ -3,6 +3,7 @@
 #from pyserial at_protocol example
 import serial
 import serial.threaded
+import numpy as np
 
 try:
     import queue
@@ -25,7 +26,7 @@ class SCPIPacketizer(serial.threaded.Packetizer):
 
     def _parse_scpi(self, token: bytes):
         if len(token) == 0: return None
-        if token[0] == b'#':
+        if token[0] == ord('#'):
             if len(token) == 1: return None
             elif token[1] in b'hH': #hex number
                 return int(token[2:],16)
@@ -34,9 +35,9 @@ class SCPIPacketizer(serial.threaded.Packetizer):
             elif token[1] in b'bB': #binary
                 return int(token[2:],2)
             elif token[1] in b'123456789': #arbitrary data
-                n = int(token[1]) #number of digits of length
-                n = int(token[2:2+n]) #length
-                data = token[2+n:]
+                d = int(token[1:2]) #number of digits of length
+                n = int(token[2:2+d]) #length
+                data = token[2+d:]
                 if len(data) != n:
                     raise SCPIException('Error parsing arbitrary data {}'.format(token))
                 return data
@@ -59,6 +60,7 @@ class SCPIPacketizer(serial.threaded.Packetizer):
 
 class SCPIProtocol:
     def __init__(self, serial_instance):
+        self.port = serial_instance
         self.responses = queue.Queue()
         self._read_thread = serial.threaded.ReaderThread(serial_instance, SCPIPacketizer.factory(self.responses))
 
@@ -78,7 +80,7 @@ class SCPIProtocol:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._read_thread.__exit__(exc_type, exc_val, exc_tb)
 
-    def command(self, command: bytes, wait_for_response=True, timeout=5):
+    def command(self, command: bytes, wait_for_response=False, timeout=5):
         if type(command) is str:
             command = bytes(command, 'utf-8')
         self._read_thread.write(command)
@@ -87,6 +89,11 @@ class SCPIProtocol:
             return self.response(timeout)
         else:
             return None
+
+    def format_bytes(self, data: bytes):
+        n = '{}'.format(len(data))
+        d = '{}'.format(len(n))
+        return bytes('#'+d+n,'utf-8') + data
 
     def response(self, timeout=5):
         try:
@@ -102,11 +109,36 @@ class TLC5955:
     LSDVLT = (1 << 4)
 
     @staticmethod    
-    def mode(dsprpt=False,tmgrst=False,rfresh=False,espwm=False,lsdvlt=False):
-        m = 0
-        if dsprpt: m |= TLC5955.DSPRPT
-        if tmgrst: m |= TLC5955.TMGRST
-        if rfresh: m |= TLC5955.RFRESH
-        if espwm: m |= TLC5955.ESPWM
-        if lsdvlt: m |= TLC5955.LSDVLT
+    def mode_code(dsprpt=False,tmgrst=False,rfresh=False,espwm=False,lsdvlt=False):
+        m  = TLC5955.DSPRPT * bool(dsprpt)
+        m |= TLC5955.TMGRST * bool(tmgrst)
+        m |= TLC5955.RFRESH * bool(rfresh)
+        m |= TLC5955.ESPWM  * bool(espwm)
+        m |= TLC5955.LSDVLT * bool(lsdvlt)
         return m
+    
+    @staticmethod
+    def maxcurrent_code(Imax_mA):
+        """picks the largest allowed current less than or equal to the given current"""
+        Imcs = [3.2,8,11.2,15.9,19.1,23.9,27.1,31.9]
+        for i,Imc in enumerate(Imcs):
+            if Imc > Imax_mA:
+                break
+        if i > 0: return i-1
+        else: return 0
+    
+    @staticmethod
+    def brightness_code(brightness):
+        """brightness within 0.1 to 1"""
+        return np.clip(np.floor((brightness-0.1)*np.nextafter(128,0)/0.9),0,127)
+    
+    @staticmethod
+    def dotcorrect_code(dot_correct_img):
+        """dot correct within 0.262 to 1"""
+        return np.clip(np.floor((dot_correct_img - 0.262)*np.nextafter(128,0)/0.738),0,127).astype(np.uint8)
+    
+    @staticmethod
+    def pwm_code(img):
+        """pwm values from 0.0 to 1.0"""
+        return np.clip(np.floor(np.nextafter(65536,0)*img),0,65535).astype(np.uint16)
+    
