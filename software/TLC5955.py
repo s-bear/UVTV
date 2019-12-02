@@ -1,10 +1,8 @@
 
 
 #from pyserial at_protocol example
-import logging
 import serial
 import serial.threaded
-import threading
 
 try:
     import queue
@@ -42,13 +40,17 @@ class SCPIPacketizer(serial.threaded.Packetizer):
                 if len(data) != n:
                     raise SCPIException('Error parsing arbitrary data {}'.format(token))
                 return data
-        elif token[0] == b'"' and token[-1] == b'"':
+        elif token[0] == ord('"') and token[-1] == ord('"'):
             return str(token[1:-1],'utf-8')
         else:
             try:
+                return int(token)
+            except ValueError:
+                pass
+            try:
                 return float(token)
             except ValueError:
-                raise SCPIException('Error parsing SCPI data {}'.format(token))
+                return token
 
     def handle_packet(self, packet: bytes):
         tokens = packet.split(b',')
@@ -59,24 +61,28 @@ class SCPIProtocol:
     def __init__(self, serial_instance):
         self.responses = queue.Queue()
         self._read_thread = serial.threaded.ReaderThread(serial_instance, SCPIPacketizer.factory(self.responses))
+
+    def start(self):
+        self._read_thread.start()
         
     def stop(self):
         self._read_thread.stop()
     
     def close(self):
         self._read_thread.close()
-
-    def connect(self):
-        return self._read_thread.connect()
     
     def __enter__(self):
-        return self._read_thread.__enter__()
+        self._read_thread.__enter__()
+        return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._read_thread.__exit__(exc_type, exc_val, exc_tb)
 
-    def command(self, command, wait_for_response=True, timeout=5):
+    def command(self, command: bytes, wait_for_response=True, timeout=5):
+        if type(command) is str:
+            command = bytes(command, 'utf-8')
         self._read_thread.write(command)
+        self._read_thread.write(SCPIPacketizer.TERMINATOR)
         if wait_for_response:
             return self.response(timeout)
         else:
@@ -87,3 +93,20 @@ class SCPIProtocol:
             return self.responses.get(timeout=timeout)
         except queue.Empty:
             raise SCPIException('SCPI response timeout')
+
+class TLC5955:
+    DSPRPT=(1 << 0)
+    TMGRST=(1 << 1)
+    RFRESH=(1 << 2)
+    ESPWM = (1 << 3)
+    LSDVLT = (1 << 4)
+
+    @staticmethod    
+    def mode(dsprpt=False,tmgrst=False,rfresh=False,espwm=False,lsdvlt=False):
+        m = 0
+        if dsprpt: m |= TLC5955.DSPRPT
+        if tmgrst: m |= TLC5955.TMGRST
+        if rfresh: m |= TLC5955.RFRESH
+        if espwm: m |= TLC5955.ESPWM
+        if lsdvlt: m |= TLC5955.LSDVLT
+        return m
