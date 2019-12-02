@@ -1,0 +1,241 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L teensy:Teensy3.2 U1
+U 1 1 5DE54476
+P 3550 3400
+F 0 "U1" H 3550 5143 60  0000 C CNN
+F 1 "Teensy3.2" H 3550 5037 60  0000 C CNN
+F 2 "teensy:Teensy30_31_32_LC" H 3550 4931 60  0000 C CNN
+F 3 "" H 3550 2650 60  0000 C CNN
+	1    3550 3400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0101
+U 1 1 5DE57F92
+P 6350 1450
+F 0 "#PWR0101" H 6350 1300 50  0001 C CNN
+F 1 "+5V" H 6365 1623 50  0000 C CNN
+F 2 "" H 6350 1450 50  0001 C CNN
+F 3 "" H 6350 1450 50  0001 C CNN
+	1    6350 1450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 5DE58A63
+P 6350 1750
+F 0 "#PWR0102" H 6350 1500 50  0001 C CNN
+F 1 "GND" H 6355 1577 50  0000 C CNN
+F 2 "" H 6350 1750 50  0001 C CNN
+F 3 "" H 6350 1750 50  0001 C CNN
+	1    6350 1750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0104
+U 1 1 5DE5AF2C
+P 2350 2050
+F 0 "#PWR0104" H 2350 1800 50  0001 C CNN
+F 1 "GND" H 2355 1877 50  0000 C CNN
+F 2 "" H 2350 2050 50  0001 C CNN
+F 3 "" H 2350 2050 50  0001 C CNN
+	1    2350 2050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2350 2050 2550 2050
+$Comp
+L power:GND #PWR0105
+U 1 1 5DE5B7F9
+P 2350 3650
+F 0 "#PWR0105" H 2350 3400 50  0001 C CNN
+F 1 "GND" H 2355 3477 50  0000 C CNN
+F 2 "" H 2350 3650 50  0001 C CNN
+F 3 "" H 2350 3650 50  0001 C CNN
+	1    2350 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2350 3650 2550 3650
+$Comp
+L power:GND #PWR0106
+U 1 1 5DE5C454
+P 4750 3550
+F 0 "#PWR0106" H 4750 3300 50  0001 C CNN
+F 1 "GND" H 4755 3377 50  0000 C CNN
+F 2 "" H 4750 3550 50  0001 C CNN
+F 3 "" H 4750 3550 50  0001 C CNN
+	1    4750 3550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4550 3550 4750 3550
+$Comp
+L power:GND #PWR0107
+U 1 1 5DE5D117
+P 4750 4450
+F 0 "#PWR0107" H 4750 4200 50  0001 C CNN
+F 1 "GND" H 4755 4277 50  0000 C CNN
+F 2 "" H 4750 4450 50  0001 C CNN
+F 3 "" H 4750 4450 50  0001 C CNN
+	1    4750 4450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4550 4450 4750 4450
+$Comp
+L power:+5V #PWR0108
+U 1 1 5DE5DA06
+P 4750 4250
+F 0 "#PWR0108" H 4750 4100 50  0001 C CNN
+F 1 "+5V" H 4765 4423 50  0000 C CNN
+F 2 "" H 4750 4250 50  0001 C CNN
+F 3 "" H 4750 4250 50  0001 C CNN
+	1    4750 4250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x02_Male J1
+U 1 1 5DE60375
+P 6050 1650
+F 0 "J1" H 6022 1532 50  0000 R CNN
+F 1 "Conn_01x02_Male" H 6200 1750 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Horizontal" H 6050 1650 50  0001 C CNN
+F 3 "~" H 6050 1650 50  0001 C CNN
+	1    6050 1650
+	1    0    0    1   
+$EndComp
+$Comp
+L Connector:Conn_01x15_Female J2
+U 1 1 5DE62F73
+P 6850 2750
+F 0 "J2" H 6878 2776 50  0000 L CNN
+F 1 "Conn_01x15_Female" H 6878 2685 50  0000 L CNN
+F 2 "teensy:Hirose_FH19SC-15S-0.5SH_1x15-1MP_P0.50mm_Horizontal" H 6850 2750 50  0001 C CNN
+F 3 "~" H 6850 2750 50  0001 C CNN
+	1    6850 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6650 2050 6050 2050
+Wire Wire Line
+	6650 2150 6150 2150
+Wire Wire Line
+	6650 2250 6150 2250
+Wire Wire Line
+	6650 2350 6050 2350
+Wire Wire Line
+	6650 2450 6150 2450
+Wire Wire Line
+	6650 2550 6150 2550
+Wire Wire Line
+	6650 2650 6150 2650
+Wire Wire Line
+	6650 2750 6050 2750
+Wire Wire Line
+	6650 2850 6150 2850
+Wire Wire Line
+	6650 2950 6150 2950
+Wire Wire Line
+	6650 3050 6050 3050
+Wire Wire Line
+	6650 3150 6150 3150
+Wire Wire Line
+	6650 3250 6150 3250
+Wire Wire Line
+	6650 3350 6150 3350
+Wire Wire Line
+	6650 3450 6050 3450
+Text Label 6150 2150 0    50   ~ 0
+GCLK
+Text Label 6150 2250 0    50   ~ 0
+SIN1
+Text Label 6150 2450 0    50   ~ 0
+SCLK
+Text Label 6150 2550 0    50   ~ 0
+LAT
+Text Label 6150 2650 0    50   ~ 0
+SOUT1_SIN2
+Text Label 6150 2850 0    50   ~ 0
+GCLK
+Text Label 6150 2950 0    50   ~ 0
+SOUT1_SIN2
+Text Label 6150 3150 0    50   ~ 0
+SCLK
+Text Label 6150 3250 0    50   ~ 0
+LAT
+Text Label 6150 3350 0    50   ~ 0
+SOUT2
+Wire Wire Line
+	6050 2050 6050 2350
+Connection ~ 6050 2350
+Wire Wire Line
+	6050 2350 6050 2750
+Connection ~ 6050 2750
+Wire Wire Line
+	6050 2750 6050 3050
+Connection ~ 6050 3050
+Wire Wire Line
+	6050 3050 6050 3450
+Connection ~ 6050 3450
+Wire Wire Line
+	6050 3450 6050 3600
+$Comp
+L power:GND #PWR0103
+U 1 1 5DE6E62A
+P 6050 3600
+F 0 "#PWR0103" H 6050 3350 50  0001 C CNN
+F 1 "GND" H 6055 3427 50  0000 C CNN
+F 2 "" H 6050 3600 50  0001 C CNN
+F 3 "" H 6050 3600 50  0001 C CNN
+	1    6050 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6350 1450 6350 1550
+Wire Wire Line
+	4550 4350 4750 4350
+Wire Wire Line
+	4750 4350 4750 4250
+Wire Wire Line
+	6250 1650 6350 1650
+Wire Wire Line
+	6350 1650 6350 1750
+Wire Wire Line
+	6250 1550 6350 1550
+Wire Wire Line
+	2550 4050 2000 4050
+Text Label 2000 4050 0    50   ~ 0
+SCLK
+Wire Wire Line
+	2550 3250 2000 3250
+Wire Wire Line
+	2550 3350 2000 3350
+Wire Wire Line
+	2550 4650 2000 4650
+Text Label 2000 4650 0    50   ~ 0
+GCLK
+Text Label 2000 3250 0    50   ~ 0
+SIN1
+Text Label 2000 3350 0    50   ~ 0
+SOUT2
+Wire Wire Line
+	2550 3150 2000 3150
+Text Label 2000 3150 0    50   ~ 0
+LAT
+$EndSCHEMATC

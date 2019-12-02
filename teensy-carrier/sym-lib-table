@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name teensy)(type Legacy)(uri C:/Users/sam/Documents/UVTV/teensy-carrier/teensy.lib)(options "")(descr ""))
+)
