@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name archive)(type Legacy)(uri ${KIPRJMOD}/UVTV-archive.lib)(options "")(descr ""))
+  (lib (name UVTV)(type Legacy)(uri "G:/Sam/Projects/UV LED display/UVTV/UVTV.lib")(options "")(descr ""))
+  (lib (name UVTV-rescue)(type Legacy)(uri ${KIPRJMOD}/UVTV-rescue.lib)(options "")(descr ""))
+)

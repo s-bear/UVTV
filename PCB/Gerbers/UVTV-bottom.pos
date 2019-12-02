@@ -1,0 +1,30 @@
+### Module positions - created on 2019-05-17 2:35:04 PM ###
+### Printed by Pcbnew version kicad (5.0.1)-3
+## Unit = mm, Angle = deg.
+## Side : bottom
+# Ref     Val                         Package                                                   PosX       PosY       Rot  Side
+C1A       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder            -1.7000    34.3250  270.0000  bottom
+C1B       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -11.4250    27.8000  180.0000  bottom
+C1C       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -21.9250    35.0000  180.0000  bottom
+C1D       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -32.4250    27.8000  180.0000  bottom
+C1E       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -42.9250    35.0000  180.0000  bottom
+C2A       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder            -1.8000    14.6750   90.0000  bottom
+C2B       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -11.4250     6.6000  180.0000  bottom
+C2C       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -21.9250    13.8000  180.0000  bottom
+C2D       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -32.4250     6.6000  180.0000  bottom
+C2E       0.1u                        C_0603_1608Metric_Pad1.05x0.95mm_HandSolder           -42.9250    13.8000  180.0000  bottom
+FID4      Fiducial_1mm_Dia_2mm_Outer  Fiducial_1mm_Dia_2mm_Outer                             -1.7000     1.6500    0.0000  bottom
+FID5      Fiducial_1mm_Dia_2mm_Outer  Fiducial_1mm_Dia_2mm_Outer                            -53.7000    43.6500    0.0000  bottom
+FID6      Fiducial_1mm_Dia_2mm_Outer  Fiducial_1mm_Dia_2mm_Outer                            -25.9000    43.6500    0.0000  bottom
+J1        Conn_01x15                  Hirose_FH19SC-15S-0.5SH_1x15-1MP_P0.50mm_Horizontal    -2.8000    24.9000  270.0000  bottom
+U-RGB1A   TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                    -7.2000    36.2500  180.0000  bottom
+U-RGB1B   TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -28.2000    36.2500  180.0000  bottom
+U-RGB1C   TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -49.2000    36.2500  180.0000  bottom
+U-RGB2A   TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                    -7.2000    15.0500  180.0000  bottom
+U-RGB2B   TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -28.2000    15.0500  180.0000  bottom
+U-RGB2C   TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -49.2000    15.0500  180.0000  bottom
+U-UV1A    TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -17.7000    29.0500  180.0000  bottom
+U-UV1C    TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -38.7000    29.0500  180.0000  bottom
+U-UV2A    TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -17.7000     7.8500  180.0000  bottom
+U-UV2C    TLC5955-RTQ                 QFN-56-1EP_8x8mm_P0.5mm_EP5.6x5.6mm                   -38.7000     7.8500  180.0000  bottom
+## End

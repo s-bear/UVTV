@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name UVTV)(type KiCad)(uri ${KIPRJMOD}/UVTV.pretty)(options "")(descr ""))
+)

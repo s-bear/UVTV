@@ -1,0 +1,21 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP LED_BGAR
+D RGB LED, blue/green/anode/red
+K LED RGB diode
+F ~
+$ENDCMP
+#
+$CMP LMZ3060x
+D Switching regulator with integrated L
+$ENDCMP
+#
+$CMP TLC5955-DCA
+D 3x16 CC LED controller
+$ENDCMP
+#
+$CMP TLC5955-RTQ
+D 3x16 CC LED controller
+$ENDCMP
+#
+#End Doc Library
