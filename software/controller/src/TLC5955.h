@@ -10,38 +10,45 @@ struct TLC5955
 
     static constexpr size_t DC_BITS = 7; //Dot Correct word size
     //Dot Correct offset (bits) -- handles multiple chips
-    static constexpr size_t DC_OFFSET(size_t pixel) {
-        return 8*CTRL_BUFFER_SIZE*(pixel/NUM_LEDS) + DC_BITS*(pixel%NUM_LEDS);
+    static constexpr size_t DC_OFFSET(size_t pixel)
+    {
+        return 8 * CTRL_BUFFER_SIZE * (pixel / NUM_LEDS) + DC_BITS * (pixel % NUM_LEDS);
     }
 
     static constexpr size_t BC_BITS = 7; //Brightness Control word size
     //Brightness control offset (bits)
-    static constexpr size_t BC_OFFSET(size_t channel) {
-        return BC_BITS*channel + 345;
+    static constexpr size_t BC_OFFSET(size_t channel)
+    {
+        return BC_BITS * channel + 345;
     }
 
     static constexpr size_t MC_BITS = 3; //Max Current word size
     //Max Current offset (bits)
-    static constexpr size_t MC_OFFSET(size_t channel) {
-        return MC_BITS*channel + 336;
+    static constexpr size_t MC_OFFSET(size_t channel)
+    {
+        return MC_BITS * channel + 336;
     }
-    static constexpr size_t FC_BITS = 5; //Function Control word size
+    static constexpr size_t FC_BITS = 5;     //Function Control word size
     static constexpr size_t FC_OFFSET = 366; //Function Control offset (bits)
 
-    enum mode_t : uint8_t {
+    enum mode_t : uint8_t
+    {
         DSPRPT = 0x1, //display repeat
         TMGRST = 0x2, //timing reset
         RFRESH = 0x4, //auto data refresh
-        ESPWM = 0x8, //enhanced spectrum PWM
+        ESPWM = 0x8,  //enhanced spectrum PWM
         LSDVLT = 0x10 //LED short detect voltage
     };
-    
+
     KINETISK_SPI_t &spi;
     uint8_t sclk, mosi, miso, latch;
+
+    uint32_t SPI_BR_FLAGS = 0;
 
     TLC5955(KINETISK_SPI_t &spi);
 
     void set_pins(uint8_t sclk, uint8_t mosi, uint8_t miso, uint8_t latch);
+    uint32_t set_baudrate(uint32_t rate);
 
     /** transfers pwm codes to a daisy chain of n TLC5955 chips
      * size_t n: number of chips, must be at least 1
@@ -57,7 +64,7 @@ struct TLC5955
      * uint8_t *in: buffer of n*96 bytes to store the chips' responses
      */
     void transfer_control(size_t n, const uint8_t *out, uint8_t *in);
-    
+
     //access control buffer
     //dot correction -- 7-bit words per pixel starting at bit 0 (bytes 0-41)
     static void set_dot_correct(uint8_t *buffer, size_t pixel, uint8_t code);
@@ -94,7 +101,7 @@ struct TLC5955
     static void copy_bits(size_t n_bits, const uint8_t *src, size_t src_bit, uint8_t *dst, size_t dst_bit);
 
 protected:
-    void transfer(bool ctrl, const uint8_t *out, uint8_t *in);
+    size_t transfer(bool ctrl, const uint8_t *out, uint8_t *in);
     void toggle_latch();
 
     //initialize and shut downt the SPI unit
