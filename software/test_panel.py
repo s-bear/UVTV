@@ -41,7 +41,7 @@ with Serial(PORTNAME) as port:
         #img[np.random.uniform(size=(12,8)) < 0.25]
        # img[...,:3] = np.random.uniform(0.0, 0.75, (12,8,3))
         #img[...,3:] = np.random.uniform(0.0,0.001,(12,8,2))
-        img[:,:,4] = 0.2
+        img[0:1,2:3,0] = 0.5
         
         img = TLC5955.pwm_code(img)
         scpi.command(b'disp:pwm:all ' + scpi.format_bytes(img.tobytes()))
