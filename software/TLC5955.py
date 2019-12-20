@@ -136,7 +136,7 @@ class TLC5955:
     def dotcorrect_code(dot_correct_img):
         """dot correct within 0.262 to 1"""
         return np.clip(np.floor((dot_correct_img - 0.262)*np.nextafter(128,0)/0.738),0,127).astype(np.uint8)
-    
+
     @staticmethod
     def pwm_code(img):
         """pwm values from 0.0 to 1.0"""
