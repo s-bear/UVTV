@@ -118,7 +118,7 @@ F 1 "Conn_01x15_Female" H 6878 2685 50  0000 L CNN
 F 2 "teensy:Hirose_FH19SC-15S-0.5SH_1x15-1MP_P0.50mm_Horizontal" H 6850 2750 50  0001 C CNN
 F 3 "~" H 6850 2750 50  0001 C CNN
 	1    6850 2750
-	1    0    0    -1  
+	1    0    0    1   
 $EndComp
 Wire Wire Line
 	6650 2050 6050 2050
