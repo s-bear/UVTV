@@ -1,8 +1,11 @@
 #include "Arduino.h"
+
 #include "TLC5955.h"
 #include "scpi.h"
 
 #include <array>
+
+
 
 //use Serial for USB, Serial1 for UART
 #define SER Serial
@@ -152,6 +155,9 @@ scpi_result_t DotcQ(scpi_t *ctx);
 scpi_result_t DotcAll(scpi_t *ctx);
 scpi_result_t DotcAllQ(scpi_t *ctx);
 
+scpi_result_t Save(scpi_t *ctx);
+scpi_result_t Load(scpi_t *ctx);
+
 scpi_result_t Pwm(scpi_t *ctx);
 scpi_result_t PwmQ(scpi_t *ctx);
 
@@ -191,6 +197,8 @@ scpi_command_t scpi_commands[] = { //{pattern, callback, tag}
     {"DISPlay:DOTCorrect?", Display::DotcQ, 0},
     {"DISPlay:DOTCorrect:ALL", Display::DotcAll, 0},
     {"DISPlay:DOTCorrect:ALL?", Display::DotcAllQ, 0},
+    {"DISPlay:SAVE", Display::Save, 0},
+    {"DISPlay:LOAD", Display::Load, 0},
     {"DISPlay:PWM", Display::Pwm, 0},
     {"DISPlay:PWM?", Display::PwmQ, 0},
     {"DISPlay:PWM:ALL", Display::PwmAll, 0},
@@ -214,6 +222,8 @@ scpi_help_t scpi_help[] = {
     {"DISPlay:BRIghtness[?]", "R,G,B,V: 4x 7-bit brightness code. UV uses the same brightness as V."},
     {"DISPlay:DOTCorrect[?]", "x,y,c[,DC]: 7-bit dot correct code for LED at (x,y,c)"},
     {"DISPlay:DOTCorrect:ALL[?]", "All dot correct codes, binary encoded each in 1 byte."},
+    {"DISPlay:SAVE", "Save MODE, MAXCurrent, and DOTCorrect values"},
+    {"DISPlay:LOAD", "Load MODE, MAXCurrent, and DOTCorrect values"},
     {"DISPlay:PWM[?]", "x,y,c[,PWM]: 16-bit PWM code for LED at (x,y,c)"},
     {"DISPlay:PWM:ALL[?]", "All PWM codes, binary encoded each in 2 bytes."},
     {"DISPlay:SPIFrequency", "f: set frequency, returns actual."},
@@ -671,6 +681,16 @@ scpi_result_t Display::EnQ(scpi_t *ctx)
 scpi_result_t Display::Refr(scpi_t *ctx)
 {
   leds.transfer_pwm(PANEL_CHIPS, pwm_buffer, nullptr);
+  return SCPI_RES_OK;
+}
+
+scpi_result_t Display::Save(scpi_t *ctx) {
+  eeprom_write_block(ctrl_buffer, 0, sizeof(ctrl_buffer));
+  return SCPI_RES_OK;
+}
+
+scpi_result_t Display::Load(scpi_t *ctx) {
+  eeprom_read_block(ctrl_buffer, 0, sizeof(ctrl_buffer));
   return SCPI_RES_OK;
 }
 
