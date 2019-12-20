@@ -45,7 +45,16 @@ with Serial(PORTNAME) as port:
         
         #all grey
         
-        img[ : ,: , 0] = 1
+        #picking random pixels:
+        #the array is 8x12 = 96 pixels, pick 10 randomly:
+        ridx = np.random.choice(96, 10, replace=False)
+        #convert the indices into coordinates
+        row, col = np.unravel_index(ridx, (8,12))
+        #img[row, col, :] = np.random.uniform(0.0, 1.0, (10,5)) #or anything that's shape (10,3)
+        img[row, col, :3] = np.random.uniform(0.0, 1.0, (10,3)) #or anything that's shape (10,3)
+        
+        
+        #img[ : ,: , 0] = 1
         #img[ : , : , 1] = 1
         #img[ : , : , 2] = 1
         #img[ : , : , 3] = 0.2
