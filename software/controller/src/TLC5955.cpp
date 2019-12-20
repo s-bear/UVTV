@@ -101,7 +101,7 @@ void TLC5955::transfer_pwm(size_t n, const uint8_t *out, uint8_t *in)
 
     spi_stop();
     toggle_latch();
-    Serial.printf("PWM: Send %d bytes",count);
+    //Serial.printf("PWM: Send %d bytes",count);
 }
 
 void TLC5955::transfer_control(size_t n, const uint8_t *out, uint8_t *in)
@@ -116,7 +116,7 @@ void TLC5955::transfer_control(size_t n, const uint8_t *out, uint8_t *in)
     }
     spi_stop();
     toggle_latch();
-    Serial.printf("CTRL: Send %d bytes", count);
+    //Serial.printf("CTRL: Send %d bytes", count);
 }
 
 size_t TLC5955::transfer(bool ctrl, const uint8_t *out, uint8_t *in)
@@ -160,8 +160,11 @@ size_t TLC5955::transfer(bool ctrl, const uint8_t *out, uint8_t *in)
         uint32_t sr = spi.SR; //read status register
         if ((sr & 0xf000) < 0x3000)
         { //there's space in the TX FIFO
-            spi.PUSHR = SPI_PUSHR_CONT;
             ++i; //only increment i when we've pushed a byte
+            if(out == nullptr && i == pad)
+                spi.PUSHR = SPI_PUSHR_EOQ;
+            else spi.PUSHR = SPI_PUSHR_CONT;
+            
         }
         if (sr & 0xf0)
         { //there's bytes to read in the RX FIFO

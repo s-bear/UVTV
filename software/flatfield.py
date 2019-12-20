@@ -27,3 +27,34 @@ maxcurrent = np.array([8, 8, 3.2, 15.9])
 brightness = np.array([0.42, 0.58, 0.5, 0.81])
 
 np.savez('panel_settings.npz', dotcorrect=dotcorrect, mode=mode, maxcurrent=maxcurrent, brightness=brightness)
+
+
+#save the flatfield settings to the control board's memory:
+
+from serial import Serial
+from TLC5955 import SCPIProtocol, SCPIException, TLC5955
+
+########################################### SET PORT NAME ###############################################
+PORTNAME = 'COM8'
+
+#convert to what the controller wants
+mode = TLC5955.mode_code(**mode) #unpack the dict and give it to mode_code as arguments
+maxcurrent = [TLC5955.maxcurrent_code(mc) for mc in maxcurrent]
+brightness = [int(TLC5955.brightness_code(bc)) for bc in brightness]
+dotcorrect = TLC5955.dotcorrect_code(dotcorrect)
+
+# Connect to panel and set the settings
+with Serial(PORTNAME) as port:
+    with SCPIProtocol(port) as scpi:
+        #first thing, turn off echo because it's annoying
+        try:
+            resp = scpi.command(b'syst:comm:echo off', True, timeout=1)
+        except SCPIException:
+            pass
+        #set the settings
+        scpi.command('disp:mode {}'.format(mode))
+        scpi.command('disp:maxc {}'.format(','.join('{}'.format(mc) for mc in maxcurrent)))
+        scpi.command('disp:bri {}'.format(','.join('{}'.format(bc) for bc in brightness)))
+        scpi.command(b'disp:dotc:all ' + scpi.format_bytes(dotcorrect.tobytes()))
+        #save the settings
+        scpi.command('disp:save')

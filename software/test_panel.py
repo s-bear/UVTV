@@ -9,22 +9,14 @@ from serial import Serial
 from TLC5955 import SCPIProtocol, SCPIException, TLC5955
 import numpy as np
 
-PORTNAME = 'COM3'
+PORTNAME = 'COM8'
 
-# Open settings file and close it at the end of the with block
-with np.load('panel_settings.npz', allow_pickle=True) as settings:
-    maxcurrent = settings['maxcurrent']
-    brightness = settings['brightness']
-    dotcorrect = settings['dotcorrect']
-    #settings['mode'] is a 0D array containing a dict of options for mode_code. use [()] to get the dict
-    mode = settings['mode'][()]
-
-print(dotcorrect[...,0])
-
+mode = {'dsprpt':True, 'espwm':True}
+maxcurrent = np.array([8, 8, 3.2, 15.9])
+brightness = np.array([0.42, 0.58, 0.5, 0.81])
 mode = TLC5955.mode_code(**mode) #unpack the dict and give it to mode_code as arguments
 maxcurrent = [TLC5955.maxcurrent_code(mc) for mc in maxcurrent]
 brightness = [int(TLC5955.brightness_code(bc)) for bc in brightness]
-dotcorrect = TLC5955.dotcorrect_code(dotcorrect)
 
 # Connect to panel and set the settings
 with Serial(PORTNAME) as port:
@@ -36,15 +28,15 @@ with Serial(PORTNAME) as port:
             pass
         
         scpi.command('disp:spif 3000000',True)
-        scpi.command('disp:mode {}'.format(mode))
-        scpi.command('disp:maxc {}'.format(','.join('{}'.format(mc) for mc in maxcurrent)))
-        scpi.command('disp:bri {}'.format(','.join('{}'.format(bc) for bc in brightness)))
-        scpi.command(b'disp:dotc:all ' + scpi.format_bytes(dotcorrect.tobytes()))
+        
+        #scpi.command('disp:mode {}'.format(mode))
+        #scpi.command('disp:maxc {}'.format(','.join('{}'.format(mc) for mc in maxcurrent)))
+        #scpi.command('disp:bri {}'.format(','.join('{}'.format(bc) for bc in brightness)))
+        
+        #load the max current, mode, brightness, and dotcorrect
+        scpi.command('disp:load')
         
         img = np.zeros((8,12,5))
-        
-       
-        
         
         #select random pixels:
         #img[np.random.uniform(size=(8,12)) < 0.25]
@@ -129,9 +121,3 @@ with Serial(PORTNAME) as port:
         
         scpi.command(b'display on')
         
-        #from numpy import load
-        #data=load('panel_settings.npz')
-        #lst = data.files
-        #for item in lst:
-            #print(item)
-            #print(data[item])

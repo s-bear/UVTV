@@ -664,7 +664,6 @@ scpi_result_t Display::En(scpi_t *ctx)
   {
     //transfer 0s
     leds.transfer_pwm(PANEL_CHIPS, nullptr, nullptr);
-    delay(1); //wait for it to latch, just in case
     //stop clock
     analogWrite(PIN_GCLK, 0);
     enabled = false;
@@ -702,7 +701,11 @@ void setup()
   SER.println("Booting");
   SER.setTimeout(100);
   init_pixel_addr_lut();
-
+  //zero buffers
+  for(size_t i = 0; i < sizeof(ctrl_buffer); ++i)
+    ctrl_buffer[i] = 0;
+  for(size_t i = 0; i < sizeof(pwm_buffer); ++i)
+    pwm_buffer[i] = 0;
   //write magic bytes into control buffer
   for (size_t i = 0; i < PANEL_CHIPS; ++i)
   {
