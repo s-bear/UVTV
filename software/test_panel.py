@@ -59,16 +59,18 @@ with Serial(PORTNAME) as port:
         valid_pixels = make_valid_pixels(96,dead_pixels)
         #the array is 8x12 = 96 pixels, pick 48 randomly:
         n_distractors = 47
-        pix_idx = np.random.choice(valid_pixels, n_distractors, replace=False)
+        pix_idx = np.random.choice(valid_pixels, n_distractors+1, replace=False)
+        target_idx = pix_idx[0]
         #convert the indices into coordinates
         row, col = np.unravel_index(pix_idx, (8,12))
-        #img[row,col] is shape (n_distractors,5)
+        #img[row,col] has shape (n_distractors,5)
         
-        distractor_colors = ([0] = 1, [1] = 1, [2] = 1, [0:3] = 0.5, [1:2] = 0.5) #something that's shape (n_colors, 5)
+        distractor_colors = np.array([[0.5]*5, [0, 0.5, 0, 0, 0], [0, 0, 0.5, 0, 0], [0, 0.5, 0.5, 0, 0], [0.2, 0.2, 0.2, 0, 0]]) #must have shape (n_colors, 5)
         color_idx = np.random.choice(distractor_colors.shape[0], n_distractors, replace=True)
-        img[row,col,:] = distractor_colors[color_idx,:]) #(n_distractors,5)
+        img[row[1:],col[1:],:] = distractor_colors[color_idx,:] #(n_distractors,5) 
+        #index 0, col. 0 and row 0 are the target, while 1:47 are the distractors
         
-        img[row, col, :] = np.random.uniform(0.0, 0.25, (n_distractors,5)) #or anything that's shape (10,3)
+        #img[row, col, :] = np.random.uniform(0.0, 0.25, (n_distractors,5)) #or anything that's shape (10,3)
         #img[row, col, :3] = np.random.uniform(0.0, 1.0, (n_distractors,3)) #or anything that's shape (10,3)
         
         # All on
@@ -130,7 +132,7 @@ with Serial(PORTNAME) as port:
         #img[3:4,4:5,1] = 0.75
         #img[3:4,4:5,2] = 0.3
         #img[3:4,4:5,3] = 0.0033
-        #img[3:4,4:5,4] = 0.5
+        #img[3:4,4:5,4] = 0.011
         
         #img[5:6,3:4,0] = 0.7
         #img[5:6,3:4,1] = 0.75
