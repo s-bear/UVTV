@@ -44,6 +44,17 @@ constexpr size_t NUM_LEDS = PANEL_CHIPS * TLC5955::NUM_LEDS;
 
 constexpr int PIN_GCLK = 20, PIN_SCLK = 14, PIN_MOSI = 11, PIN_MISO = 12, PIN_LATCH = 10;
 
+constexpr size_t SER_LEN = 8;
+constexpr char *ROM_SER = 0; //null terminated string, at most 8 bytes long
+constexpr uint32_t *ROM_BR = (uint32_t *)8;
+constexpr void *ROM_CTRL = (void*)32;
+
+const char *SCPI_IDN1 = "\"Samuel Powell\""; //Manufacturer
+const char *SCPI_IDN2 = "UVTV";              //Model
+static char SCPI_IDN3[SER_LEN+1] = {0}; //Serial #, read from EEPROM but still needs global allocation
+//const char *SCPI_IDN3 = "0000";              //Serial #
+const char *SCPI_IDN4 = "0";                 //Revision
+
 bool echo = true, enabled = false;
 
 template <typename T, size_t N>
@@ -122,15 +133,14 @@ void init_pixel_addr_lut()
 /* SCPI Commands */
 constexpr size_t SCPI_INPUT_BUFFER_SIZE = 1024;
 constexpr size_t SCPI_ERROR_QUEUE_SIZE = 4;
-const char *SCPI_IDN1 = "\"Samuel Powell\""; //Manufacturer
-const char *SCPI_IDN2 = "UVTV";              //Model
-const char *SCPI_IDN3 = "0000";              //Serial #
-const char *SCPI_IDN4 = "0";                 //Revision
+
 
 namespace System
 { //use a namespace to aid code browsing
 scpi_result_t Help(scpi_t *ctx);
 scpi_result_t Prog(scpi_t *ctx);
+scpi_result_t Ser(scpi_t *ctx);
+scpi_result_t SerQ(scpi_t *ctx);
 scpi_result_t ErrAllQ(scpi_t *ctx);
 scpi_result_t CommEcho(scpi_t *ctx);
 scpi_result_t CommEchoQ(scpi_t *ctx);
@@ -181,6 +191,8 @@ scpi_command_t scpi_commands[] = { //{pattern, callback, tag}
     {"HELP", System::Help, 0},
     {"SYSTem:HELP:HEADers?", System::Help, 1},
     {"SYSTem:PROGram", System::Prog, 0},
+    {"SYSTem:SERial", System::Ser, 0},
+    {"SYSTem:SERial?", System::SerQ, 0},
     {"SYSTem:ERRor:ALL?", System::ErrAllQ, 0},
     {"SYSTem:COMMunicate:ECHO", System::CommEcho, 0},
     {"SYSTem:COMMunicate:ECHO?", System::CommEchoQ, 0},
@@ -214,6 +226,7 @@ scpi_help_t scpi_help[] = {
     SCPI_HELP_BASIC,
     {"SYSTem:ERRor:ALL?", "List all current errors"},
     {"SYSTem:PROGram", "Reboot into bootloader for programming"},
+    {"SYSTem:SERial?", "The device serial number, as reported by *IDN?"},
     {"SYSTem:COMMunicate:ECHO[?] ON|OFF", "Enable serial echo"},
     {"DISPlay[:ENable][?]", "Turn panel on or off"},
     {"DISPlay:GEOMetry?", "Return HEIGHT,WIDTH,CHANNELS of the panel"},
@@ -222,9 +235,9 @@ scpi_help_t scpi_help[] = {
     {"DISPlay:BRIghtness[?]", "R,G,B,V: 4x 7-bit brightness code. UV uses the same brightness as V."},
     {"DISPlay:DOTCorrect[?]", "x,y,c[,DC]: 7-bit dot correct code for LED at (x,y,c)"},
     {"DISPlay:DOTCorrect:ALL[?]", "All dot correct codes, binary encoded each in 1 byte."},
-    {"DISPlay:SAVE", "Save MODE, MAXCurrent, and DOTCorrect values"},
-    {"DISPlay:LOAD", "Load MODE, MAXCurrent, and DOTCorrect values"},
     {"DISPlay:PWM[?]", "x,y,c[,PWM]: 16-bit PWM code for LED at (x,y,c)"},
+    {"DISPlay:SAVE", "Save SPIFreq, MODE, MAXCurrent, and DOTCorrect values"},
+    {"DISPlay:LOAD", "Load SPIFreq, MODE, MAXCurrent, and DOTCorrect values"},
     {"DISPlay:PWM:ALL[?]", "All PWM codes, binary encoded each in 2 bytes."},
     {"DISPlay:SPIFrequency", "f: set frequency, returns actual."},
     {"DISPlay:REFResh", "(Re)send PWM codes to panel."},
@@ -305,6 +318,28 @@ scpi_result_t System::ErrAllQ(scpi_t *ctx)
 scpi_result_t System::Prog(scpi_t *ctx)
 {
   _reboot_Teensyduino_();
+  return SCPI_RES_OK;
+}
+
+scpi_result_t System::Ser(scpi_t *ctx)
+{
+  const char *buffer;
+  size_t len;
+  if(SCPI_ParamCharacters(ctx,&buffer, &len,true)) {
+    if(len > SER_LEN) {
+      SCPI_ErrorPush(ctx, SCPI_ERROR_INVALID_STRING_DATA);
+      return SCPI_RES_ERR;
+    }
+    eeprom_write_block(buffer, ROM_SER, len);
+    memcpy(SCPI_IDN3,buffer,len);
+    return SCPI_RES_OK;
+  }
+  else return SCPI_RES_ERR;
+}
+
+scpi_result_t System::SerQ(scpi_t *ctx)
+{
+  SCPI_ResultCharacters(ctx, SCPI_IDN3, strlen(SCPI_IDN3));
   return SCPI_RES_OK;
 }
 
@@ -684,12 +719,14 @@ scpi_result_t Display::Refr(scpi_t *ctx)
 }
 
 scpi_result_t Display::Save(scpi_t *ctx) {
-  eeprom_write_block(ctrl_buffer, 0, sizeof(ctrl_buffer));
+  eeprom_write_dword(ROM_BR,leds.get_br_flags());
+  eeprom_write_block(ctrl_buffer, ROM_CTRL, sizeof(ctrl_buffer));
   return SCPI_RES_OK;
 }
 
 scpi_result_t Display::Load(scpi_t *ctx) {
-  eeprom_read_block(ctrl_buffer, 0, sizeof(ctrl_buffer));
+  leds.set_br_flags(eeprom_read_dword(ROM_BR));
+  eeprom_read_block(ctrl_buffer, ROM_CTRL, sizeof(ctrl_buffer));
   return SCPI_RES_OK;
 }
 
@@ -712,9 +749,11 @@ void setup()
     TLC5955::set_magic(ctrl_buffer + ctrl_addr(i));
   }
   //initialize SCPI parser
+  char scpi_ser[SER_LEN+1] = {0};
+  eeprom_read_block(scpi_ser,ROM_SER,SER_LEN);
   SCPI_Init(&scpi_context, scpi_commands,
             &scpi_interface, scpi_units_def,
-            SCPI_IDN1, SCPI_IDN2, SCPI_IDN3, SCPI_IDN4,
+            SCPI_IDN1, SCPI_IDN2, scpi_ser, SCPI_IDN4,
             scpi_input_buffer, SCPI_INPUT_BUFFER_SIZE,
             scpi_error_queue, SCPI_ERROR_QUEUE_SIZE);
   //set up clock

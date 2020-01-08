@@ -228,6 +228,24 @@ uint32_t spi_baudrate(uint8_t PBR, uint8_t DBR, uint32_t BR)
     return (F_CPU * uint32_t(1 + DBR)) / (PBR_lut[PBR] * (2 << BR));
 }
 
+void TLC5955::set_br_flags(uint32_t flags)
+{
+    SPI_BR_FLAGS = flags;
+}
+
+uint32_t TLC5955::get_br_flags()
+{
+    return SPI_BR_FLAGS;
+}
+
+uint32_t TLC5955::get_baudrate()
+{
+    uint8_t PBR = (SPI_BR_FLAGS >> 16) & 3;
+    uint8_t DBR = (SPI_BR_FLAGS & SPI_CTAR_DBR) == 0 ? 0 : 1;
+    uint8_t BR = SPI_BR_FLAGS & 15;
+    return spi_baudrate(PBR,DBR,BR);
+}
+
 uint32_t TLC5955::set_baudrate(uint32_t rate)
 {
     //2 + {0,1,3,5}

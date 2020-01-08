@@ -49,6 +49,9 @@ struct TLC5955
 
     void set_pins(uint8_t sclk, uint8_t mosi, uint8_t miso, uint8_t latch);
     uint32_t set_baudrate(uint32_t rate);
+    uint32_t get_baudrate();
+    void set_br_flags(uint32_t flags);
+    uint32_t get_br_flags();
 
     /** transfers pwm codes to a daisy chain of n TLC5955 chips
      * size_t n: number of chips, must be at least 1
