@@ -104,7 +104,7 @@ U 1 1 5DE60375
 P 6050 1650
 F 0 "J1" H 6022 1532 50  0000 R CNN
 F 1 "Conn_01x02_Male" H 6200 1750 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Horizontal" H 6050 1650 50  0001 C CNN
+F 2 "teensy:TerminalBlock_DECA-MB312-254-2" H 6050 1650 50  0001 C CNN
 F 3 "~" H 6050 1650 50  0001 C CNN
 	1    6050 1650
 	1    0    0    1   
@@ -242,7 +242,7 @@ U 1 1 5DE734F8
 P 8100 1650
 F 0 "J3" H 7992 1325 50  0000 C CNN
 F 1 "Conn_01x02_Female" H 7992 1416 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Horizontal" H 8100 1650 50  0001 C CNN
+F 2 "teensy:TerminalBlock_DECA-MB312-254-2" H 8100 1650 50  0001 C CNN
 F 3 "~" H 8100 1650 50  0001 C CNN
 	1    8100 1650
 	1    0    0    1   
@@ -293,4 +293,48 @@ Wire Wire Line
 Connection ~ 7500 1550
 Wire Wire Line
 	7500 1550 7900 1550
+NoConn ~ 4550 3650
+NoConn ~ 4550 3950
+NoConn ~ 4550 4050
+NoConn ~ 4550 4150
+NoConn ~ 4550 4250
+NoConn ~ 4550 4550
+NoConn ~ 4550 4650
+NoConn ~ 4550 4750
+NoConn ~ 4550 2050
+NoConn ~ 4550 2150
+NoConn ~ 4550 2250
+NoConn ~ 4550 2350
+NoConn ~ 4550 2450
+NoConn ~ 4550 2550
+NoConn ~ 4550 2650
+NoConn ~ 4550 2750
+NoConn ~ 4550 2850
+NoConn ~ 4550 2950
+NoConn ~ 4550 3050
+NoConn ~ 4550 3150
+NoConn ~ 4550 3250
+NoConn ~ 4550 3350
+NoConn ~ 4550 3450
+NoConn ~ 2550 2150
+NoConn ~ 2550 2250
+NoConn ~ 2550 2350
+NoConn ~ 2550 2450
+NoConn ~ 2550 2550
+NoConn ~ 2550 2650
+NoConn ~ 2550 2750
+NoConn ~ 2550 2850
+NoConn ~ 2550 2950
+NoConn ~ 2550 3050
+NoConn ~ 2550 3450
+NoConn ~ 2550 3550
+NoConn ~ 2550 3750
+NoConn ~ 2550 3850
+NoConn ~ 2550 3950
+NoConn ~ 2550 4150
+NoConn ~ 2550 4250
+NoConn ~ 2550 4350
+NoConn ~ 2550 4450
+NoConn ~ 2550 4550
+NoConn ~ 2550 4750
 $EndSCHEMATC
