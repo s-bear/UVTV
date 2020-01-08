@@ -233,11 +233,11 @@ scpi_help_t scpi_help[] = {
     {"DISPlay:MODE[?]", "5-bit Function Control register. Accepts a number or a list of named options:\r\n    Dsprpt, Tmgrst, Rfresh, Espwm, Lsdvlt\r\n  D,E is probably what you want."},
     {"DISPlay:MAXCurrent[?]", "R,G,B,V: 4x 3-bit maximum current code. UV uses the same max current as V."},
     {"DISPlay:BRIghtness[?]", "R,G,B,V: 4x 7-bit brightness code. UV uses the same brightness as V."},
-    {"DISPlay:DOTCorrect[?]", "x,y,c[,DC]: 7-bit dot correct code for LED at (x,y,c)"},
+    {"DISPlay:DOTCorrect[?]", "y,x,c[,DC]: 7-bit dot correct code for LED at (y,x,c)"},
     {"DISPlay:DOTCorrect:ALL[?]", "All dot correct codes, binary encoded each in 1 byte."},
-    {"DISPlay:PWM[?]", "x,y,c[,PWM]: 16-bit PWM code for LED at (x,y,c)"},
     {"DISPlay:SAVE", "Save SPIFreq, MODE, MAXCurrent, and DOTCorrect values"},
     {"DISPlay:LOAD", "Load SPIFreq, MODE, MAXCurrent, and DOTCorrect values"},
+    {"DISPlay:PWM[?]", "y,x,c[,PWM]: 16-bit PWM code for LED at (y,x,c)"},
     {"DISPlay:PWM:ALL[?]", "All PWM codes, binary encoded each in 2 bytes."},
     {"DISPlay:SPIFrequency", "f: set frequency, returns actual."},
     {"DISPlay:REFResh", "(Re)send PWM codes to panel."},
@@ -474,11 +474,11 @@ scpi_result_t Display::BriQ(scpi_t *ctx)
 
 scpi_result_t Display::Dotc(scpi_t *ctx)
 {
-  uint32_t xycv[4];
+  uint32_t yxcv[4];
   size_t len;
-  if (!SCPI_ParamArrayUInt32(ctx, xycv, alen(xycv), &len, SCPI_FORMAT_ASCII, true))
+  if (!SCPI_ParamArrayUInt32(ctx, yxcv, alen(yxcv), &len, SCPI_FORMAT_ASCII, true))
     return SCPI_RES_ERR;
-  uint32_t &x = xycv[0], &y = xycv[1], &c = xycv[2], &v = xycv[3];
+  uint32_t &y = yxcv[0], &x = yxcv[1], &c = yxcv[2], &v = yxcv[3];
   if (len != 4 || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS || v > 0x7f)
   {
     SCPI_ErrorPush(ctx, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
@@ -490,11 +490,11 @@ scpi_result_t Display::Dotc(scpi_t *ctx)
 
 scpi_result_t Display::DotcQ(scpi_t *ctx)
 {
-  uint32_t xyc[3];
+  uint32_t yxc[3];
   size_t len;
-  if (!SCPI_ParamArrayUInt32(ctx, xyc, alen(xyc), &len, SCPI_FORMAT_ASCII, true))
+  if (!SCPI_ParamArrayUInt32(ctx, yxc, alen(yxc), &len, SCPI_FORMAT_ASCII, true))
     return SCPI_RES_ERR;
-  uint32_t &x = xyc[0], &y = xyc[1], &c = xyc[2];
+  uint32_t &y = yxc[0], &x = yxc[1], &c = yxc[2];
   if (len != 3 || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS)
   {
     SCPI_ErrorPush(ctx, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
@@ -537,12 +537,12 @@ scpi_result_t Display::DotcAllQ(scpi_t *ctx)
 
 scpi_result_t Display::Pwm(scpi_t *ctx)
 {
-  uint32_t xycv[4];
+  uint32_t yxcv[4];
   size_t len;
-  if (!SCPI_ParamArrayUInt32(ctx, xycv, alen(xycv), &len, SCPI_FORMAT_ASCII, true))
+  if (!SCPI_ParamArrayUInt32(ctx, yxcv, alen(yxcv), &len, SCPI_FORMAT_ASCII, true))
     return SCPI_RES_ERR;
-  uint32_t &x = xycv[0], &y = xycv[1], &c = xycv[2], &v = xycv[3];
-  if (len != alen(xycv) || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS || v > 0xffff)
+  uint32_t &y = yxcv[0], &x = yxcv[1], &c = yxcv[2], &v = yxcv[3];
+  if (len != alen(yxcv) || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS || v > 0xffff)
   {
     SCPI_ErrorPush(ctx, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
     return SCPI_RES_ERR;
@@ -553,12 +553,12 @@ scpi_result_t Display::Pwm(scpi_t *ctx)
 
 scpi_result_t Display::PwmQ(scpi_t *ctx)
 {
-  uint32_t xyc[3];
+  uint32_t yxc[3];
   size_t len;
-  if (!SCPI_ParamArrayUInt32(ctx, xyc, alen(xyc), &len, SCPI_FORMAT_ASCII, true))
+  if (!SCPI_ParamArrayUInt32(ctx, yxc, alen(yxc), &len, SCPI_FORMAT_ASCII, true))
     return SCPI_RES_ERR;
-  uint32_t &x = xyc[0], &y = xyc[1], &c = xyc[2];
-  if (len != alen(xyc) || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS)
+  uint32_t &y = yxc[0], &x = yxc[1], &c = yxc[2];
+  if (len != alen(yxc) || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS)
   {
     SCPI_ErrorPush(ctx, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
     return SCPI_RES_ERR;
@@ -601,11 +601,11 @@ scpi_result_t Display::PwmAllQ(scpi_t *ctx)
 //TODO: delete?
 scpi_result_t Display::LutQ(scpi_t *ctx)
 {
-  uint32_t xyc[3];
+  uint32_t yxc[3];
   size_t len;
-  if (!SCPI_ParamArrayUInt32(ctx, xyc, alen(xyc), &len, SCPI_FORMAT_ASCII, true))
+  if (!SCPI_ParamArrayUInt32(ctx, yxc, alen(yxc), &len, SCPI_FORMAT_ASCII, true))
     return SCPI_RES_ERR;
-  uint32_t &x = xyc[0], &y = xyc[1], &c = xyc[2];
+  uint32_t &y = yxc[0], &x = yxc[1], &c = yxc[2];
   if (len != 3 || x >= PANEL_WIDTH || y >= PANEL_HEIGHT || c >= PANEL_CHANNELS)
   {
     SCPI_ErrorPush(ctx, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
