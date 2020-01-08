@@ -37,7 +37,7 @@
 constexpr uint32_t PANEL_WIDTH = 12;
 constexpr uint32_t PANEL_HEIGHT = 8;
 constexpr uint32_t PANEL_CHANNELS = 5;
-constexpr uint32_t PANEL_DIMS[3] = {PANEL_WIDTH, PANEL_HEIGHT, PANEL_CHANNELS};
+constexpr uint32_t PANEL_DIMS[3] = {PANEL_HEIGHT, PANEL_WIDTH, PANEL_CHANNELS};
 
 constexpr size_t PANEL_CHIPS = 10;
 constexpr size_t NUM_LEDS = PANEL_CHIPS * TLC5955::NUM_LEDS;
@@ -216,7 +216,7 @@ scpi_help_t scpi_help[] = {
     {"SYSTem:PROGram", "Reboot into bootloader for programming"},
     {"SYSTem:COMMunicate:ECHO[?] ON|OFF", "Enable serial echo"},
     {"DISPlay[:ENable][?]", "Turn panel on or off"},
-    {"DISPlay:GEOMetry?", "Return WIDTH,HEIGHT,CHANNELS of the panel"},
+    {"DISPlay:GEOMetry?", "Return HEIGHT,WIDTH,CHANNELS of the panel"},
     {"DISPlay:MODE[?]", "5-bit Function Control register. Accepts a number or a list of named options:\r\n    Dsprpt, Tmgrst, Rfresh, Espwm, Lsdvlt\r\n  D,E is probably what you want."},
     {"DISPlay:MAXCurrent[?]", "R,G,B,V: 4x 3-bit maximum current code. UV uses the same max current as V."},
     {"DISPlay:BRIghtness[?]", "R,G,B,V: 4x 7-bit brightness code. UV uses the same brightness as V."},
