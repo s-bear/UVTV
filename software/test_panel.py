@@ -55,27 +55,43 @@ with Serial(PORTNAME) as port:
         
         
         #picking random pixels:
-        dead_pixels = [7,77]
-        valid_pixels = make_valid_pixels(96,dead_pixels)
+        dead_pixels = [7,80,38]
+        valid_pixels = make_valid_pixels(96, dead_pixels)
         #the array is 8x12 = 96 pixels, pick 48 randomly:
-        n_distractors = 47
-        pix_idx = np.random.choice(valid_pixels, n_distractors+1, replace=False)
+        n_distractors = 48
+        pix_idx = np.random.choice(valid_pixels, n_distractors, replace=False)
         target_idx = pix_idx[0]
         #convert the indices into coordinates
         row, col = np.unravel_index(pix_idx, (8,12))
-        #img[row,col] has shape (n_distractors,5)
+       #img[row,col] has shape (n_distractors,5)
         
-        distractor_colors = np.array([[0.5]*5, [0, 0.5, 0, 0, 0], [0, 0, 0.5, 0, 0], [0, 0.5, 0.5, 0, 0], [0.2, 0.2, 0.2, 0, 0]]) #must have shape (n_colors, 5)
+        distractor_colors = np.array([[0.95,0.39,0.153,0.00141,0.00115], [0.89, 0.37, 0.143, 0.001320, 0.001080], [0.633, 0.263, 0.102, 0.000939, 0.000776], [0.412, 0.171, 0.0661, 0.000610, 0.000600], [0.285, 0.118, 0.0457, 0.000422, 0.000394]]) #must have shape (n_colors, 5)
         color_idx = np.random.choice(distractor_colors.shape[0], n_distractors, replace=True)
-        img[row[1:],col[1:],:] = distractor_colors[color_idx,:] #(n_distractors,5) 
+        #img[row[:],col[:],:] = distractor_colors[color_idx,:] #(n_distractors,5) 
         #index 0, col. 0 and row 0 are the target, while 1:47 are the distractors
         
+        #make target
+        #n_target = 1
+        #target_color = np.array([1,0,0,0,0])
+        #target_color_idx = np.random.choice(target_color.shape[0], n_target, replace=True)
+        #img[row[:],col[:],:] = target_color[target_idx,:]
+
         #img[row, col, :] = np.random.uniform(0.0, 0.25, (n_distractors,5)) #or anything that's shape (10,3)
         #img[row, col, :3] = np.random.uniform(0.0, 1.0, (n_distractors,3)) #or anything that's shape (10,3)
         
-        # All on
-        #img[: , :, 4] = 0.2
-        
+        # TEST settings
+        #img[: , :, 0] = 0.89
+        #img[: , :, 1] = 0.37
+        #img[: , :, 2] = 0.143
+        #img[: , :, 3] = 0.001379
+        #img[: , :, 4] = 0.001191
+
+        #img[1:2,7:8,0] = 0.317
+        #img[1:2,7:8,1] = 0.131
+        #img[1:2,7:8,2] = 0.0508
+        #img[1:2,7:8,3] = 0.000469
+        #img[1:2,7:8,4] = 0.000438
+
         #Blue training 
       
         #img[1:2,7:8,0] = 0.024
@@ -126,14 +142,14 @@ with Serial(PORTNAME) as port:
         #img[1:2,5:6,1] = 0.75
         #img[1:2,5:6,2] = 0.3
         #img[1:2,5:6,3] = 0.0033
-        #img[1:2,5:6,4] = 0.011
+        img[1:2,5:6,4] = 0.2
         
         #img[3:4,4:5,0] = 0.7
         #img[3:4,4:5,1] = 0.75
         #img[3:4,4:5,2] = 0.3
         #img[3:4,4:5,3] = 0.0033
         #img[3:4,4:5,4] = 0.011
-        
+    
         #img[5:6,3:4,0] = 0.7
         #img[5:6,3:4,1] = 0.75
         #img[5:6,3:4,2] = 0.3
