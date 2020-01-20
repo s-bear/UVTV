@@ -180,6 +180,7 @@ scpi_result_t EnQ(scpi_t *ctx);
 scpi_result_t Refr(scpi_t *ctx);
 
 scpi_result_t SPIFreq(scpi_t *ctx);
+scpi_result_t SPIFreqQ(scpi_t *ctx);
 
 scpi_result_t LutQ(scpi_t *ctx);
 } // namespace Display
@@ -216,6 +217,7 @@ scpi_command_t scpi_commands[] = { //{pattern, callback, tag}
     {"DISPlay:PWM:ALL", Display::PwmAll, 0},
     {"DISPlay:PWM:ALL?", Display::PwmAllQ, 0},
     {"DISPlay:SPIFrequency", Display::SPIFreq, 0},
+    {"DISPlay:SPIFrequency?", Display::SPIFreqQ, 0},
     {"DISPlay:REFResh", Display::Refr, 0},
     {"DISPlay:LUT?", Display::LutQ, 0},
     SCPI_CMD_LIST_END};
@@ -239,7 +241,7 @@ scpi_help_t scpi_help[] = {
     {"DISPlay:LOAD", "Load SPIFreq, MODE, MAXCurrent, and DOTCorrect values"},
     {"DISPlay:PWM[?]", "y,x,c[,PWM]: 16-bit PWM code for LED at (y,x,c)"},
     {"DISPlay:PWM:ALL[?]", "All PWM codes, binary encoded each in 2 bytes."},
-    {"DISPlay:SPIFrequency", "f: set frequency, returns actual."},
+    {"DISPlay:SPIFrequency[?]", "f: set frequency, returns actual."},
     {"DISPlay:REFResh", "(Re)send PWM codes to panel."},
     SCPI_HELP_LIST_END};
 
@@ -330,8 +332,10 @@ scpi_result_t System::Ser(scpi_t *ctx)
       SCPI_ErrorPush(ctx, SCPI_ERROR_INVALID_STRING_DATA);
       return SCPI_RES_ERR;
     }
-    eeprom_write_block(buffer, ROM_SER, len);
-    memcpy(SCPI_IDN3,buffer,len);
+    memset(SCPI_IDN3, 0, SER_LEN+1);
+    memcpy(SCPI_IDN3, buffer, len);
+    eeprom_write_block(SCPI_IDN3, ROM_SER, SER_LEN);
+    
     return SCPI_RES_OK;
   }
   else return SCPI_RES_ERR;
@@ -406,6 +410,11 @@ scpi_result_t Display::SPIFreq(scpi_t *ctx)
     return SCPI_RES_ERR;
   val = leds.set_baudrate(val);
   SCPI_ResultUInt32(ctx, val);
+  return SCPI_RES_OK;
+}
+
+scpi_result_t Display::SPIFreqQ(scpi_t *ctx) {
+  SCPI_ResultUInt32(ctx, leds.get_baudrate());
   return SCPI_RES_OK;
 }
 
@@ -749,11 +758,11 @@ void setup()
     TLC5955::set_magic(ctrl_buffer + ctrl_addr(i));
   }
   //initialize SCPI parser
-  char scpi_ser[SER_LEN+1] = {0};
-  eeprom_read_block(scpi_ser,ROM_SER,SER_LEN);
+  eeprom_read_block(SCPI_IDN3,ROM_SER,SER_LEN);
+  SCPI_IDN3[SER_LEN+1] = 0;
   SCPI_Init(&scpi_context, scpi_commands,
             &scpi_interface, scpi_units_def,
-            SCPI_IDN1, SCPI_IDN2, scpi_ser, SCPI_IDN4,
+            SCPI_IDN1, SCPI_IDN2, SCPI_IDN3, SCPI_IDN4,
             scpi_input_buffer, SCPI_INPUT_BUFFER_SIZE,
             scpi_error_queue, SCPI_ERROR_QUEUE_SIZE);
   //set up clock
