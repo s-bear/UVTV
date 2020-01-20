@@ -53,6 +53,8 @@ with Serial(PORTNAME) as port:
         except SCPIException:
             pass
         #set the settings
+        scpi.command('syst:ser "01"')
+        scpi.command('disp:spif 3000000',True)
         scpi.command('disp:mode {}'.format(mode))
         scpi.command('disp:maxc {}'.format(','.join('{}'.format(mc) for mc in maxcurrent)))
         scpi.command('disp:bri {}'.format(','.join('{}'.format(bc) for bc in brightness)))
