@@ -8,8 +8,14 @@ Created on Tue Jan  7 16:07:07 2020
 from PIL import Image
 from skimage.morphology import watershed
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 red = np.array(Image.open('red.tif'))
+green = np.array(Image.open('green.tif')) 
+blue = np.array(Image.open('blue.tif')) 
+violet = np.array(Image.open('violet.tif'))
+uv = np.array(Image.open('uv.tif')) 
 
 def make_flat_field(img, corners):
     """ calculate flat field image
@@ -23,9 +29,8 @@ def make_flat_field(img, corners):
     #convert to luminance by summing
     img = np.sum(img, -1, float)
     
-    #TODO: take new photos so that this doesn't need to be rotated
     #rotate 90 degrees so that the X of the image aligns with X of the LEDs
-    img = img.T[:,::-1]
+    #img = img.T[:,::-1]
     
     #rescale to 0 to 1
     img = (img - img.min()) / (img.max() - img.min())
@@ -47,38 +52,38 @@ def make_flat_field(img, corners):
     markers[grid[...,0],grid[...,1]] = 1 + np.arange(96).reshape(grid.shape[:2])
     
     labels = watershed(img_inv, markers)
+    #remove any labels from pixels that are too dark, note, this will completely remove any dead LEDs from the labels
     labels[img < 0.1] = 0
     
     #take the means of the img image over each watershed area
     means = np.empty(grid.shape[:2])
     for i in range(96):
+        #n.b. if there are any missing labels (e.g. from dead LEDs) then
+        # the corresponding mean will be nan
         means.flat[i] = np.mean(img[labels == (i+1)])
     
+    #plot, to see if it's working
+    #use nanmin to get the minimum of means, just in case there's a dead LED
+    #the dotcorrect coefficient at the dead LED will still be nan
+    dotcorrect = np.nanmin(means)/means
+    corrected = np.copy(img)
+    for i in range(96):
+        corrected[labels == (i+1)] *= dotcorrect.flat[i]
+    
+    fig,ax = plt.subplots(1,2)
+    ax[0].imshow(img)
+    ax[0].scatter(grid[...,1].flat,grid[...,0].flat,c=np.arange(96))
+    ax[1].imshow(corrected)
+
     return means, labels
 
 
-#crop to the active area
-#TODO: get the right crop coordinates
-crop = (slice(1126,2330),slice(1736,2700))
-red = red[crop]
+#get the right corner coordinates
+red_means, red_labels = make_flat_field(red, (491, 376, 4080, 3100))
+green_means, green_labels = make_flat_field(green, (491, 376, 4080, 3100))
+blue_means, blue_labels = make_flat_field(blue, (491, 376, 4080, 3100))
+violet_means, violet_labels = make_flat_field(violet, (491, 376, 4080, 3100))
+uv_means, uv_labels = make_flat_field(uv, (491, 376, 4080, 3100))
 
-#TODO: get the right corner coordinates
-means, labels = make_flat_field(red, (65, 65, 1125, 905))
-
-#TODO: save the means so that flatfield.py can load them
-#TODO: also process the other color channel images
-
-#try it out:
-dotcorrect = means.min()/means
-red_ff = np.sum(red, -1, float).T[:,::-1]
-for i in range(96):
-    red_ff[labels == (i+1)] *= dotcorrect.flat[i]
-
-
-#show the images    
-import matplotlib.pyplot as plt
-
-fig,ax = plt.subplots(1,2)
-ax[0].imshow(red)
-ax[1].imshow(red_ff)
-plt.show()
+#save the means so that flatfield.py can load them
+np.savez('mean_flatfield_brightness.npz', red=red_means, green=green_means, blue=blue_means, violet=violet_means, uv=uv_means)

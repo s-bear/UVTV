@@ -135,6 +135,8 @@ class TLC5955:
     @staticmethod
     def dotcorrect_code(dot_correct_img):
         """dot correct within 0.262 to 1"""
+        dot_correct_img = np.asarray(dot_correct_img)
+        dot_correct_img[np.isnan(dot_correct_img)] = 1.0 #dead pixels have a dc of nan
         return np.clip(np.floor((dot_correct_img - 0.262)*np.nextafter(128,0)/0.738),0,127).astype(np.uint8)
 
     @staticmethod
