@@ -1,11 +1,33 @@
+/* main.cpp
+
+Copyright 2020 Samuel B. Powell
+samuel.powell@uq.edu.au
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 #include "Arduino.h"
 
 #include "TLC5955.h"
 #include "scpi.h"
 
 #include <array>
-
-
 
 //use Serial for USB, Serial1 for UART
 #define SER Serial
@@ -52,8 +74,7 @@ constexpr void *ROM_CTRL = (void*)32;
 const char *SCPI_IDN1 = "\"Samuel Powell\""; //Manufacturer
 const char *SCPI_IDN2 = "UVTV";              //Model
 static char SCPI_IDN3[SER_LEN+1] = {0}; //Serial #, read from EEPROM but still needs global allocation
-//const char *SCPI_IDN3 = "0000";              //Serial #
-const char *SCPI_IDN4 = "0";                 //Revision
+const char *SCPI_IDN4 = "2020-11-02";                 //Revision
 
 bool echo = true, enabled = false;
 
@@ -165,6 +186,8 @@ scpi_result_t DotcQ(scpi_t *ctx);
 scpi_result_t DotcAll(scpi_t *ctx);
 scpi_result_t DotcAllQ(scpi_t *ctx);
 
+scpi_result_t CurrQ(scpi_t *ctx);
+
 scpi_result_t Save(scpi_t *ctx);
 scpi_result_t Load(scpi_t *ctx);
 
@@ -210,6 +233,7 @@ scpi_command_t scpi_commands[] = { //{pattern, callback, tag}
     {"DISPlay:DOTCorrect?", Display::DotcQ, 0},
     {"DISPlay:DOTCorrect:ALL", Display::DotcAll, 0},
     {"DISPlay:DOTCorrect:ALL?", Display::DotcAllQ, 0},
+    {"DISPlay:CURRent?",Display::CurrQ, 0},
     {"DISPlay:SAVE", Display::Save, 0},
     {"DISPlay:LOAD", Display::Load, 0},
     {"DISPlay:PWM", Display::Pwm, 0},
@@ -241,6 +265,7 @@ scpi_help_t scpi_help[] = {
     {"DISPlay:LOAD", "Load SPIFreq, MODE, MAXCurrent, and DOTCorrect values"},
     {"DISPlay:PWM[?]", "y,x,c[,PWM]: 16-bit PWM code for LED at (y,x,c)"},
     {"DISPlay:PWM:ALL[?]", "All PWM codes, binary encoded each in 2 bytes."},
+    {"DISPlay:CURRent?", "Estimate current required to display image."},
     {"DISPlay:SPIFrequency[?]", "f: set frequency, returns actual."},
     {"DISPlay:REFResh", "(Re)send PWM codes to panel."},
     SCPI_HELP_LIST_END};
@@ -542,6 +567,15 @@ scpi_result_t Display::DotcAllQ(scpi_t *ctx)
   }
   SCPI_ResultArbitraryBlock(ctx, dc, sizeof(dc));
   return SCPI_RES_OK;
+}
+
+scpi_result_t Display::CurrQ(scpi_t *ctx)
+{
+  uint32_t dc = 0, bc = 0, mc = 0, pwm = 0;
+  for(size_t i = 0; i < NUM_LEDS; ++i) {
+    dc += TLC5955::get_dot_correct(ctrl_buffer, pixel_addr_lut[i]);
+    pwm += TLC5955::get_pwm(pwm_buffer, pixel_addr_lut[i]);
+  }
 }
 
 scpi_result_t Display::Pwm(scpi_t *ctx)

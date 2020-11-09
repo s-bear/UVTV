@@ -1,3 +1,27 @@
+/* TLC5955.cpp
+
+Copyright 2020 Samuel B. Powell
+samuel.powell@uq.edu.au
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 #include "TLC5955.h"
 #include <Arduino.h>
 
@@ -81,10 +105,58 @@ void TLC5955::set_pwm(uint8_t *buffer, size_t pixel, uint16_t value)
     *(b) = uint8_t(value & 0xff);
 }
 
-uint16_t TLC5955::get_pwm(uint8_t *buffer, size_t pixel)
+uint16_t TLC5955::get_pwm(const uint8_t *buffer, size_t pixel)
 {
-    uint8_t *b = buffer + 2 * pixel;
+    const uint8_t *b = buffer + 2 * pixel;
     return (uint16_t(*(b+1)) << 8) | uint16_t(*(b)); //big endian
+}
+
+//right shift by n bits, but add 1 if the shifted bits are >= 0.5
+static uint32_t rshift_round(uint32_t x, uint32_t n) {
+    if(n == 0) return x;
+    x = x >> (n-1);
+    return (x >> 1) + (x & 1);
+}
+
+uint32_t TLC5955::get_current(const uint8_t *ctrl_buffer, const uint8_t *pwm_buffer)
+{
+    // sum max_current(c) * brightness(c) * dotcorrect(c,i) * pwm(c,i)
+    // There are 16 LEDs per channel 
+    // The PWM coefficients are 0-65535 (Q0.16, range < 1.0)
+    // The DC coefficients are 0-65536 (Q1.16 <= 1.0)
+    // DC[i]*PWM[i] is Q0.32 (because DC <= 1.0 and PWM < 1.0)
+    // sum DC[i]*PWM[i] -> 16*DC*PWM -> Q4.32 : 4-bit overflow!
+    // sum (DC[i]*PWM[i] >> 4) -> Q4.28 < 16
+    uint32_t cc[3] = {0,0,0}; //channel current
+    for(size_t i = 0; i < NUM_LEDS; ++i) {
+        uint32_t pwm = get_pwm(pwm_buffer, i); 
+        uint32_t dc = DC_VALUE[get_dot_correct(ctrl_buffer,i)];
+        cc[i%3] += rshift_round(pwm*dc, 4);
+    }
+    //load BC and MC coefficients
+    uint32_t bc[3] = {BC_VALUE[get_brightness(ctrl_buffer, 0)],
+                      BC_VALUE[get_brightness(ctrl_buffer, 1)],
+                      BC_VALUE[get_brightness(ctrl_buffer, 2)]};
+    uint32_t mc[3] = {MC_VALUE[get_max_current(ctrl_buffer, 0)],
+                      MC_VALUE[get_max_current(ctrl_buffer, 1)],
+                      MC_VALUE[get_max_current(ctrl_buffer, 2)]};
+    // cc is Q4.28 < 16
+    // BC is 0-65536 (Q1.16 <= 1.0)
+    // cc*BC is (Q4.44 < 16) -- 16 bit overflow
+    //  (cc >> 16)*BC is (Q4.12 < 16)*(Q1.16 <= 1.0) -> (Q4.28 < 16)
+    //  chopping off the low 16 bits of cc means we round at 2^-12 = 1/4096 = 0.0002
+    cc[0] = bc[0] * rshift_round(cc[0], 16);
+    cc[1] = bc[1] * rshift_round(cc[1], 16);
+    cc[2] = bc[2] * rshift_round(cc[2], 16);
+    // MC is 0-31.9 (Q5.11 < 32)
+    // cc*MC is (Q4.28 < 16)*(Q5.11 < 32) -> (Q9.39 < 512) -- 16 bit overflow
+    //  (cc >> 16)*MC is (Q4.12 < 16)*(Q5.11 < 32) -> (Q9.23 < 512)
+    // sum(MC*cc) < 3*512 = 1536 -> Q11.23 -- 2-bit overflow
+    cc[0] = rshift_round(mc[0] * rshift_round(cc[0], 16), 2);
+    cc[1] = rshift_round(mc[1] * rshift_round(cc[1], 16), 2);
+    cc[2] = rshift_round(mc[2] * rshift_round(cc[2], 16), 2);
+    
+    return cc[0] + cc[1] + cc[2]; //Q11.21
 }
 
 /* Communication code */

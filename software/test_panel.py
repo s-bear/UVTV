@@ -1,41 +1,56 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  2 15:08:06 2019
+Created on Tue Nov  3 14:21:13 2020
 
-@author: 61473
+@author: uqkchene_local
 """
 
+import numpy as np
+import os
+from tkinter import Tk, messagebox
 from serial import Serial
 from TLC5955 import SCPIProtocol, SCPIException, TLC5955
-import numpy as np
-from time import sleep
 
-import matplotlib as mpl
-mpl.use('Qt5Agg') #draw figures in a window
-import matplotlib.pyplot as plt
-plt.ioff() #do not use "interactive mode" -- ie. plt.show() waits until figures are closed
+########################################### SET PORT NAME ###############################################
+PORTNAME = 'COM5'
 
-PORTNAME = 'COM8'
+# Setting reset_config to True will save default settings into panel_config.npz
+#  otherwise we'll load panel_config.npz and use the stored settings
+reset_config = False
 
-mode = {'dsprpt':True, 'espwm':True}
-maxcurrent = np.array([8, 8, 3.2, 15.9])
-brightness = np.array([0.42, 0.58, 0.5, 0.81])
-dotcorrect = np.ones((8,12,5))
-mode = TLC5955.mode_code(**mode) #unpack the dict and give it to mode_code as arguments
-mcs = [TLC5955.maxcurrent_code(mc) for mc in maxcurrent]
-bcs = [int(TLC5955.brightness_code(bc)) for bc in brightness]
-dcs = TLC5955.dotcorrect_code(dotcorrect)
+# Setting save_config to True will save the configuration settings to the
+#  display panel in addition to panel_config.npz
+save_config = False
+
+config_path = 'board 2'
+
+config_file = os.path.join(config_path,'panel_config.npz')
+
+if not os.path.exists(config_file): reset_config = True
+if reset_config:
+    serial = '2'
+    mode = {'dsprpt':True, 'espwm':True}
+    maxcurrent = np.array([8, 8, 3.2, 15.9])
+    brightness = np.array([0.42, 0.58, 0.5, 0.81])
+    dotcorrect = np.ones((8,12,5))
+    spif = 3000000
+    np.savez(config_file,serial=serial,mode=mode,maxcurrent=maxcurrent,brightness=brightness,dotcorrect=dotcorrect,spif=spif)
+else:
+    with np.load(config_file,allow_pickle=True) as cfg:
+        mode = cfg['mode'][()]
+        maxcurrent = cfg['maxcurrent']
+        brightness = cfg['brightness']
+        dotcorrect = cfg['dotcorrect']
+        spif = cfg['spif']
+
+mode = TLC5955.mode_code(**mode)
+maxcurrent = [TLC5955.maxcurrent_code(mc) for mc in maxcurrent]
+brightness = [int(TLC5955.brightness_code(bc)) for bc in brightness]
+dotcorrect = TLC5955.dotcorrect_code(dotcorrect)
 
 img = np.zeros((8,12,5))
-img[...,1] = 1
-
-def img_current(img, currents):
-    """ img is (...,5), currents is (4,)"""
-    currents = np.concatenate((currents,[currents[-1]]))
-    return np.sum(img*currents)
-
-#convert to the panel's data format
-img = TLC5955.pwm_code(img)
+def img_bytes(img):
+    return scpi.format_bytes(TLC5955.pwm_code(img).tobytes())
 
 # Connect to panel and set the settings
 with Serial(PORTNAME) as port:
@@ -45,31 +60,35 @@ with Serial(PORTNAME) as port:
             resp = scpi.command(b'syst:comm:echo off', True, timeout=1)
         except SCPIException:
             pass
-        
+        #TODO: scpi.command(f'syst:serial?') to check that serial # matches
+        scpi.command('disp:spif {}'.format(spif),True)
         scpi.command('disp:mode {}'.format(mode))
-        scpi.command('disp:maxc {}'.format(','.join('{}'.format(mc) for mc in mcs)))
-        scpi.command('disp:bri {}'.format(','.join('{}'.format(bc) for bc in bcs)))
-        scpi.command(b'disp:dotc:all ' + scpi.format_bytes(dcs.tobytes()))
-        scpi.command('disp:spif 30000',True)
-        #load the max current, mode, brightness, and dotcorrect
-        #scpi.command('disp:load')
-        scpi.command(b'disp:pwm:all ' + scpi.format_bytes(img.tobytes()))
+        scpi.command('disp:maxc {}'.format(','.join('{}'.format(mc) for mc in maxcurrent)))
+        scpi.command('disp:bri {}'.format(','.join('{}'.format(bc) for bc in brightness)))
+        scpi.command(b'disp:dotc:all ' + scpi.format_bytes(dotcorrect.tobytes()))
         
-        #turn on the display
-        scpi.command(b'display on')
-        sleep(5)
+        if save_config:
+            scpi.command('disp:save')
         
-        scpi.command('disp off')
-        #turn off the display when the figure is closed
-        #scpi.command(b'display off')
+        #show an alignment image
+        # three corners are red, green, blue
+        img[[0,0,-1],[0,-1,-1],[0,1,2]] = 0.25
         
-'''
-for y in range(8):
-            for x in range(12):
-                for c in range(3):
-                    cmd = 'disp:pwm {}, {}, {}, 65535'.format(y,x,c)
-                    print(cmd)
-                    scpi.command(cmd)
-                    scpi.command('disp:refresh')
-                    sleep(0.01)
-                    '''
+        scpi.command(b'disp:pwm:all ' + img_bytes(img))
+        scpi.command(b'disp on')
+        answer = messagebox.askyesno('LED Panel', 'Alignment. Continue?')
+        scpi.command(b'disp off')
+        img[:] = 0
+        if answer:
+            #cycle through the flatfielded images
+            for c in range(5):
+                img[...,c] = 0.25
+                scpi.command(b'disp:pwm:all ' + img_bytes(img))
+                scpi.command(b'disp on')
+                answer = messagebox.askyesno('LED Panel', 'Continue?')
+                scpi.command(b'disp off')
+                img[...,c] = 0
+                if not answer:
+                    break
+
+Tk().mainloop()
