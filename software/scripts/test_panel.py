@@ -22,7 +22,7 @@ reset_config = False
 #  display panel in addition to panel_config.npz
 save_config = False
 
-config_path = 'board 2'
+config_path = 'board 2 data/2'
 
 config_file = os.path.join(config_path,'panel_config.npz')
 

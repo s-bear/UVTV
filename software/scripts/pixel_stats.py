@@ -13,7 +13,7 @@ from skimage.measure import moments, regionprops
 from skimage.segmentation import flood
 from skimage.draw import circle
 
-config_path = 'board 2'
+config_path = 'board 2 data/2'
 
 def path(fname):
     return os.path.abspath(os.path.join(config_path,fname))
