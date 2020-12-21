@@ -1,8 +1,7 @@
 This is example flatfield calibration data from the 2nd UVTV board made.
 
-0.7z, 1.7z, and 2.7z hold compressed data captured before calibration (0) and 
-after 1 and 2 iterations of the procedure respectively. Decompress using
-7-zip to replicate the procedure.
+The directories 0, 1, and 2 hold data captured before calibration (0) and 
+after 1 and 2 iterations of the procedure respectively.
 
 The "test_panel.py" script was run to show the "corners", "red", "green",
 "blue", "violet", and "uv" images.
@@ -17,7 +16,8 @@ Photos of the display were taken at each stage of the script using a modified
 Olympus E-PL5 camera, the raw ORF files saved in 'board 2 data/0'.
 
 The ORF files were converted to tiff using RawTherapee, with the settings
-stored in the associated pp3 files.
+stored in the associated pp3 files. As the tiff files are too large for
+github, you must generate them yourself using RawTherapee.
 
 "pixel_stats.py" was run with
     config_path = 'board 2 data/0'
