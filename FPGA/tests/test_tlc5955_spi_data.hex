@@ -1,0 +1,25 @@
+//memory for test_tlc595_spi.v
+//each word should be 16 bits (4 hex digits) separated by whitespace
+//there need to be at least 2**AddrWidth entries
+// 0, 16, 32 == 0x00, 0x10, 0x20
+bead cb7b 09c9 9c1b df7e 7f3b c3a8 7049 349a e466 39b4 4b4f e17d fd64 ea16 11c3
+4ace 41f7 0fe6 f1f8 a6f1 16f0 e9eb babe 6ee2 b025 7e78 e5d7 87e7 5c4d 7f29 21ee
+2924 490e 0196 4df0 a0cc ebea 482c 8f7c d8f1 94c0 a25f 0b84 4c67 94df 1b69 beef
+// 48, 64, 80
+dead 9784 467d e1ad 7fc1 7ee9 39af fb3e fb24 ea2b f8b9 1532 958c 02ef 7ded 66f7
+1636 fa46 692d a7d6 17dc 0f83 0489 babe 15a1 7fe1 0bec 61b8 f2d1 2569 2941 d688
+6a11 e053 b7e4 5baf 6098 49fe d486 c615 e85a b6c1 c1d0 fcba bba9 096a bbc0 beef
+// 96, 112, 128
+deed aa53 b49e 3014 8978 5efd a6d4 b7c6 ccf4 61e8 2ebe 0808 8a89 d1c5 15d2 5cba
+1544 2678 c873 bae7 f171 cb03 a9b1 babe d31d a808 d33f 0b89 491c 4de6 3708 a5d8
+47a9 db6f a34c a7fa c0ce 2ff7 e2bd 6ee9 4564 96df 4754 6261 14be 4979 e148 beef
+// 144, 160, 176
+feed 4f16 9a9f 2d4d cd00 7274 c26f ba39 66b6 8985 76a2 bbf8 e0bf b6bc 9fda a836
+f1e8 8e90 c748 bcd6 754c b882 bedd babe 6f2d 63bb 3239 52e9 cc23 9930 f9aa c6d5
+93bb 7fb9 21e8 da9b c248 1ecf 62f3 6499 5a37 a2cf 3b45 19e6 c956 5e07 774f beef
+// 192, 208, 224
+deaf 2ea0 645b d146 9e90 cc82 2fec 8446 8a2a c738 3995 24c7 a1ab 81ff f76c db94
+c6d1 0521 6e07 3a4e e931 39ee 2a8b babe 3c09 2373 f049 ca2c 53cd 0a4f 5af5 fcc2
+c55a b842 1e9a cc65 4f2c 9118 24f1 4ebc cb9f 0707 9f5c d870 475f d79d 0fae beef
+// 240
+dead df6d 5f7d 51fb a568 0b98 aabf 6a8d d4b7 89aa a08e 13cf 9600 b80c ee43 beef

@@ -1,0 +1,37 @@
+Compiling VVP ...
+ ... VVP file version 10.1 (stable)
+Compile cleanup...
+ ...      112 functors (net_fun pool=524288 bytes)
+                 19 logic
+                  0 bufif
+                  0 resolv
+                 67 signals
+ ...       97 filters (net_fil pool=524288 bytes)
+ ...      698 opcodes (24576 bytes)
+ ...      123 nets
+ ...      112 vvp_nets (1048544 bytes)
+ ...        0 arrays (0 words)
+ ...        1 memories
+                  1 logic (128 words)
+                  0 real (0 words)
+ ...       15 scopes
+ ... 0 seconds, 23032.0/4812.0/2356.0 KBytes size/rss/shared
+Running ...
+ ...execute EndOfCompile callbacks
+ ...propagate initialization events
+ ...execute StartOfSim callbacks
+ ...run scheduler
+WARNING: ../ram_dp_generic.v:61: $readmemh(test_tlc5955_spi_data.hex): Too many words in the file for the requested range [0:127].
+FST info: dumpfile test_tlc5955_spi.fst opened for output.
+ ...execute Postsim callbacks
+ ... 0.046875 seconds, 23084.0/5444.0/2724.0 KBytes size/rss/shared
+Event counts:
+        6411 time steps (pool=128)
+       13452 thread schedule events
+       77101 assign events
+             ...assign(vec4) pool=9362
+             ...assign(vec8) pool=204
+             ...assign(real) pool=256
+             ...assign(word) pool=128
+             ...assign(word/r) pool=204
+        7649 other events (pool=4096)

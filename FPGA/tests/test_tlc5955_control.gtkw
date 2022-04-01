@@ -1,0 +1,95 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Thu Apr 18 06:23:48 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test/test_tlc5955_control.fst"
+[dumpfile_mtime] "Thu Apr 18 06:21:57 2019"
+[dumpfile_size] 16568
+[savefile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test/test_tlc5955_control.gtkw"
+[timestart] 1221700000
+[size] 1920 1017
+[pos] -1 -1
+*-25.236652 17820000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_tlc5955_control.
+[treeopen] test_tlc5955_control.tlc5955_control_0.
+[treeopen] test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.
+[treeopen] test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.
+[treeopen] test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.
+[sst_width] 302
+[signals_width] 176
+[sst_expanded] 1
+[sst_vpaned_height] 307
+@28
+test_tlc5955_control.clk
+test_tlc5955_control.reset
+@200
+-TLC5955 PHY
+@28
+test_tlc5955_control.gsclk
+test_tlc5955_control.sclk
+test_tlc5955_control.mosi
+test_tlc5955_control.lat
+test_tlc5955_control.tlc5955_control_0.transfer
+test_tlc5955_control.tlc5955_control_0.spi_busy
+@22
+test_tlc5955_control.tlc5955_control_0.gsclk_timer[7:0]
+@200
+-CMD & RSP
+@28
+test_tlc5955_control.tlc5955_control_0.cmd_valid
+@820
+test_tlc5955_control.tlc5955_control_0.cmd_data[7:0]
+@28
+test_tlc5955_control.tlc5955_control_0.cmd_next
+@22
+test_tlc5955_control.tlc5955_control_0.c_state[3:0]
+@28
+test_tlc5955_control.tlc5955_control_0.rsp_ready
+test_tlc5955_control.tlc5955_control_0.rsp_valid
+@820
+test_tlc5955_control.tlc5955_control_0.rsp_data[7:0]
+@28
+test_tlc5955_control.tlc5955_control_0.gsclk_en_D
+@200
+-ASCII
+@28
+test_tlc5955_control.tlc5955_control_0.ascii_done
+test_tlc5955_control.tlc5955_control_0.ascii_error
+test_tlc5955_control.tlc5955_control_0.ascii_shift
+@22
+test_tlc5955_control.tlc5955_control_0.ascii_hex_parser.value[15:0]
+@28
+test_tlc5955_control.tlc5955_control_0.ascii_hex_parser.done_sr[3:0]
+test_tlc5955_control.tlc5955_control_0.ascii_hex_parser.first
+@200
+-BUFFER
+@28
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.write_en
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.write_en
+@22
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.write_addr[7:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.write_addr[7:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.write_data[15:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.write_data[15:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.write_mask[15:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.read_addr[7:0]
+@29
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.set_read_addr
+@28
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.read_next
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.read_en
+@22
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.raddr[7:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.read_addr[7:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.read_data[15:0]
+test_tlc5955_control.tlc5955_control_0.tlc5955_buffer_0.ram_0.genblk1.ram_dp_generic_0.read_data[15:0]
+@200
+-XFER
+@28
+test_tlc5955_control.tlc5955_control_0.x_start_config
+test_tlc5955_control.tlc5955_control_0.x_start_pixels
+test_tlc5955_control.tlc5955_control_0.x_state[1:0]
+test_tlc5955_control.tlc5955_control_0.x_busy
+test_tlc5955_control.tlc5955_control_0.tlc5955_spi_0.busy
+[pattern_trace] 1
+[pattern_trace] 0

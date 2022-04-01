@@ -1,0 +1,52 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Mon Apr  1 06:49:29 2019
+[*]
+[dumpfile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_tlc5955_spi.fst"
+[dumpfile_mtime] "Mon Apr  1 06:43:29 2019"
+[dumpfile_size] 4864
+[savefile] "/mnt/c/Users/uqspowe6/source/TinyFPGA-LED/test_tlc5955_spi.gtkw"
+[timestart] 0
+[size] 2560 1377
+[pos] -1 -1
+*-18.569695 32114440 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_tlc5955_spi.
+[treeopen] test_tlc5955_spi.tlc5955_spi_0.
+[sst_width] 189
+[signals_width] 175
+[sst_expanded] 1
+[sst_vpaned_height] 433
+@28
+test_tlc5955_spi.clk
+test_tlc5955_spi.reset
+test_tlc5955_spi.transfer
+test_tlc5955_spi.config_bit
+test_tlc5955_spi.busy
+@22
+test_tlc5955_spi.tlc5955_spi_0.data_in[15:0]
+@28
+test_tlc5955_spi.tlc5955_spi_0.next_data
+test_tlc5955_spi.tlc5955_spi_0.spi_idle
+test_tlc5955_spi.tlc5955_spi_0.spi_xfer
+test_tlc5955_spi.tlc5955_spi_0.state[2:0]
+test_tlc5955_spi.tlc5955_spi_0.spi_ack
+test_tlc5955_spi.tlc5955_spi_0.spi_in_valid
+@20000028
+test_tlc5955_spi.sclk
+@22
+test_tlc5955_spi.tlc5955_spi_0.spi_master_0.mosi_word[15:0]
+@29
+test_tlc5955_spi.tlc5955_spi_0.spi_master_0.mosi_word[15:0]
+@28
+test_tlc5955_spi.mosi
+test_tlc5955_spi.miso
+test_tlc5955_spi.lat
+@200
+-
+@22
+test_tlc5955_spi.tlc5955_spi_0.spi_master_0.mosi_bit[3:0]
+@28
+test_tlc5955_spi.tlc5955_spi_0.lat_D
+test_tlc5955_spi.tlc5955_spi_0.spi_in_valid
+[pattern_trace] 1
+[pattern_trace] 0

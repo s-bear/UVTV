@@ -1,0 +1,36 @@
+Compiling VVP ...
+ ... VVP file version 10.1 (stable)
+Compile cleanup...
+ ...      348 functors (net_fun pool=524288 bytes)
+                 60 logic
+                  0 bufif
+                  0 resolv
+                186 signals
+ ...      299 filters (net_fil pool=524288 bytes)
+ ...     2731 opcodes (73728 bytes)
+ ...      378 nets
+ ...      348 vvp_nets (1048544 bytes)
+ ...        1 arrays (2 words)
+ ...        4 memories
+                  4 logic (3584 words)
+                  0 real (0 words)
+ ...       46 scopes
+ ... 0.015625 seconds, 23308.0/5112.0/2356.0 KBytes size/rss/shared
+Running ...
+ ...execute EndOfCompile callbacks
+ ...propagate initialization events
+ ...execute StartOfSim callbacks
+ ...run scheduler
+FST info: dumpfile test_tlc5955_control.fst opened for output.
+ ...execute Postsim callbacks
+ ... 1.375 seconds, 23652.0/5868.0/2736.0 KBytes size/rss/shared
+Event counts:
+      157703 time steps (pool=128)
+      465391 thread schedule events
+     5370562 assign events
+             ...assign(vec4) pool=9362
+             ...assign(vec8) pool=204
+             ...assign(real) pool=256
+             ...assign(word) pool=128
+             ...assign(word/r) pool=204
+      215941 other events (pool=4096)
