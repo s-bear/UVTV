@@ -6,6 +6,7 @@ Created on Mon Dec  2 15:08:06 2019
 """
 
 from serial import Serial
+from serial.tools.list_ports import comports
 from TLC5955 import SCPIProtocol, SCPIException, TLC5955
 import numpy as np
 
@@ -17,7 +18,20 @@ from matplotlib.colors import to_rgba
 from matplotlib.patches import RegularPolygon
 from matplotlib.collections import PatchCollection
 
-PORTNAME = 'COM4'
+## Set PORTNAME = None to auto-detect
+PORTNAME = None
+
+if PORTNAME is None:
+    print('Detecting Serial ports... ',end='',flush=True)
+    target_hwid = 'VID:PID=16C0:04'
+    for port in comports():
+        if port.hwid.find(target_hwid) > 0:
+            PORTNAME = port.device
+            print(f'Found Teensy on {PORTNAME}')
+            break
+if PORTNAME is None:
+    print('Could not find Teensy USB!')
+    exit(1)
 
 mode = {'dsprpt':True, 'espwm':True}
 maxcurrent = np.array([8, 8, 3.2, 15.9])
