@@ -11,7 +11,7 @@ from TLC5955 import SCPIProtocol, SCPIException, TLC5955
 import numpy as np
 
 import matplotlib as mpl
-mpl.use('Qt5Agg') #draw figures in a window
+mpl.use('TkAgg') #draw figures in a window
 import matplotlib.pyplot as plt
 plt.ioff() #do not use "interactive mode" -- ie. plt.show() waits until figures are closed
 from matplotlib.colors import to_rgba
