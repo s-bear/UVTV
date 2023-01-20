@@ -23,40 +23,80 @@ class SCPIPacketizer(serial.threaded.Packetizer):
     @staticmethod
     def factory(response_queue: queue.Queue):
         return lambda: SCPIPacketizer(response_queue)
-
-    def _parse_scpi(self, token: bytes):
-        if len(token) == 0: return None
-        if token[0] == ord('#'):
-            if len(token) == 1: return None
-            elif token[1] in b'hH': #hex number
-                return int(token[2:],16)
-            elif token[1] in b'qQ': #octal
-                return int(token[2:],8)
-            elif token[1] in b'bB': #binary
-                return int(token[2:],2)
-            elif token[1] in b'123456789': #arbitrary data
-                d = int(token[1:2]) #number of digits of length
-                n = int(token[2:2+d]) #length
-                data = token[2+d:]
-                if len(data) != n:
-                    raise SCPIException('Error parsing arbitrary data {}'.format(token))
-                return data
-        elif token[0] == ord('"') and token[-1] == ord('"'):
-            return str(token[1:-1],'utf-8')
-        else:
-            try:
-                return int(token)
-            except ValueError:
-                pass
-            try:
-                return float(token)
-            except ValueError:
-                return token
-
+        
+    def _parse_scpi(self, packet : bytes):
+        if len(packet) == 0: return []
+        responses = []
+        i = 0
+        
+        while i < len(packet):
+            c = packet[i]
+            if c == ord(','):
+                i += 1 #pop c
+                continue #discard delimiters between items
+            elif c == ord('#'): #hex, octal, or binary number; or arbitrary data
+                i += 1 #pop c
+                c = packet[i] #peek at next character
+                if c in b'hHqQbB': 
+                    #number -- parse to the comma
+                    i += 1 #pop c
+                    j = packet.find(b',',i)
+                    if j == -1:
+                        j = len(packet) #not found -- consume to end of packet
+                    base = None
+                    if c in b'hH': base = 16
+                    elif c in b'qQ': base = 8
+                    elif c in b'bB': base = 2
+                    x = int(packet[i:j],base)
+                    i = j #pop number (leave the comma)
+                    responses.append(x)
+                    continue
+                elif c in b'123456789':
+                    #arbitrary data -- length delimited, but still has a comma after it!
+                    d = int(chr(c)) #number of digits in length
+                    i += 1 #pop d
+                    n = int(packet[i:i+d]) #length
+                    i += d #pop n
+                    data = bytes(packet[i:i+n])
+                    if len(data) != n:
+                        raise SCPIException(f'ERROR: end of packet while parsing arbitrary data. Expected {n} bytes, got {len(data)}.')
+                    i += n #pop data (leave the comma)
+                    responses.append(data)
+                    continue
+                else:
+                    raise SCPIException(f'ERROR: Unexpected character: {c}')
+            elif c == ord('"'): #string
+                i += 1 #pop c
+                j = packet.find(b'"',i)
+                if j == -1: #no closing quote
+                    raise SCPIException('ERROR: Unterminated string')
+                s = str(packet[i:j],'utf-8')
+                i = j+1 #pop string & quote (leave the comma)
+                responses.append(s)
+                continue
+            else:
+                #decimal integer, float, or naked string response
+                #parse to comma
+                j = packet.find(b',',i)
+                if j == -1: #no trailing comma -- parse to end
+                    j = len(packet)
+                try:
+                    x = int(packet[i:j])
+                except ValueError:
+                    #not an int ... try float
+                    try:
+                        x = float(packet[i:j])
+                    except ValueError:
+                        #not a float, try string
+                        x = str(packet[i:j],'utf-8')
+                i = j #pop number (leave the comma)
+                responses.append(x)
+        return responses
+    
     def handle_packet(self, packet: bytes):
-        tokens = packet.split(b',')
-        response = [self._parse_scpi(token) for token in tokens]
+        response = self._parse_scpi(packet)
         self._response_queue.put(response)
+        
 
 class SCPIProtocol:
     def __init__(self, serial_instance):
@@ -118,6 +158,16 @@ class TLC5955:
         return m
     
     @staticmethod
+    def mode(mc):
+        modes = {}
+        modes['dsprpt'] = bool(mc & TLC5955.DSPRPT)
+        modes['tmgrst'] = bool(mc & TLC5955.TMGRST)
+        modes['rfresh'] = bool(mc & TLC5955.RFRESH)
+        modes['espwm'] = bool(mc & TLC5955.ESPWM)
+        modes['lsdvlt'] = bool(mc & TLC5955.LSDVLT)
+        return modes
+    
+    @staticmethod
     def maxcurrent_code(Imax_mA):
         """picks the largest allowed current less than or equal to the given current"""
         Imcs = [3.2,8,11.2,15.9,19.1,23.9,27.1,31.9]
@@ -128,19 +178,41 @@ class TLC5955:
         else: return 0
     
     @staticmethod
-    def brightness_code(brightness):
-        """brightness within 0.1 to 1"""
-        return np.clip(np.floor((brightness-0.1)*np.nextafter(128,0)/0.9),0,127)
+    def maxcurrent_mA(Imax_code):
+        """return the current in mA for a given maxcurrent code"""
+        Imcs = [3.2,8,11.2,15.9,19.1,23.9,27.1,31.9]
+        return Imcs[Imax_code]
     
     @staticmethod
-    def dotcorrect_code(dot_correct_img):
-        """dot correct within 0.262 to 1"""
-        dot_correct_img = np.asarray(dot_correct_img)
-        dot_correct_img[np.isnan(dot_correct_img)] = 1.0 #dead pixels have a dc of nan
-        return np.clip(np.floor((dot_correct_img - 0.262)*np.nextafter(128,0)/0.738),0,127).astype(np.uint8)
-
+    def brightness_code(brightness):
+        """brightness within 0.1 to 1"""
+        return np.clip(np.floor((brightness-0.1)*np.nextafter(128,0)/0.9),0,127).astype(np.uint8)
+    
+    @staticmethod
+    def brightness(brightness_code):
+        """return brightness coefficient from a given brightness code"""
+        return np.clip(0.1 + 0.9*brightness_code/127, 0.1, 1.0)
+    
+    @staticmethod
+    def dotcorrect_code(dc_img):
+        """dot correct within 0.262 to 1."""
+        dc_img = np.asarray(dc_img)
+        dc_img[np.isnan(dc_img)] = 1.0 #dead pixels have a dc of nan
+        return np.clip(np.floor((dc_img - 0.262)*np.nextafter(128,0)/0.738),0,127).astype(np.uint8)
+    
+    @staticmethod
+    def dotcorrect_img(dc_code):
+        """dot correct coefficient given a code."""
+        dc_code = np.asarray(dc_code)
+        return np.clip(0.262 + 0.738*dc_code/127,0.262,1.0)
+    
     @staticmethod
     def pwm_code(img):
         """pwm values from 0.0 to 1.0"""
         return np.clip(np.floor(np.nextafter(65536,0)*img),0,65535).astype(np.uint16)
+    
+    @staticmethod
+    def pwm_img(pwm_code):
+        """pwm ratio from a given code"""
+        return np.clip(pwm_code/65535,0.0,1.0)
     
